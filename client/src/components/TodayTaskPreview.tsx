@@ -32,83 +32,77 @@ const typeLabels: Record<string, string> = {
 };
 
 export function TodayTaskPreview({ tasks }: TodayTaskPreviewProps) {
-  const pendingTasks = tasks.filter(t => !t.completed);
-  const completedTasks = tasks.filter(t => t.completed);
+  const pendingCount = tasks.filter(t => !t.completed).length;
+  const completedCount = tasks.filter(t => t.completed).length;
+
+  // 按照完成时间或计划时间排序
+  const sortedTasks = [...tasks].sort((a, b) => {
+    const timeA = a.completed && a.completedAt ? a.completedAt : a.scheduledTime;
+    const timeB = b.completed && b.completedAt ? b.completedAt : b.scheduledTime;
+    return timeA.localeCompare(timeB);
+  });
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>今日任务预览 Today's Preview</CardTitle>
         <CardDescription>
-          {pendingTasks.length} 个待完成，{completedTasks.length} 个已完成
+          {pendingCount} 个待完成，{completedCount} 个已完成
           <br />
-          {pendingTasks.length} pending, {completedTasks.length} completed
+          {pendingCount} pending, {completedCount} completed
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {pendingTasks.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-muted-foreground">待完成 Pending</h4>
-            {pendingTasks.map((task) => (
-              <div
-                key={task.id}
-                className="flex items-center gap-3 p-3 rounded-lg border bg-card hover-elevate"
-                data-testid={`preview-pending-${task.id}`}
-              >
-                <Circle className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="font-medium text-sm">{task.title}</span>
-                    <Badge variant="outline" className={`text-xs ${typeColors[task.type]}`}>
-                      {typeLabels[task.type]}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Clock className="h-3 w-3" />
-                    <span className="font-mono">计划时间 {task.scheduledTime}</span>
-                  </div>
-                </div>
+      <CardContent className="space-y-2">
+        {sortedTasks.map((task) => (
+          <div
+            key={task.id}
+            className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
+              task.completed
+                ? "bg-chart-2/5 border-chart-2/20"
+                : "bg-card hover-elevate"
+            }`}
+            data-testid={`preview-task-${task.id}`}
+          >
+            {task.completed ? (
+              <CheckCircle2 className="h-5 w-5 text-chart-2 flex-shrink-0" />
+            ) : (
+              <Circle className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+            )}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap mb-1">
+                <span
+                  className={`font-medium text-sm ${
+                    task.completed ? "text-chart-2" : ""
+                  }`}
+                >
+                  {task.title}
+                </span>
+                <Badge variant="outline" className={`text-xs ${typeColors[task.type]}`}>
+                  {typeLabels[task.type]}
+                </Badge>
               </div>
-            ))}
-          </div>
-        )}
-
-        {completedTasks.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-muted-foreground">已完成 Completed</h4>
-            {completedTasks.map((task) => (
-              <div
-                key={task.id}
-                className="flex items-center gap-3 p-3 rounded-lg border bg-card opacity-75"
-                data-testid={`preview-completed-${task.id}`}
-              >
-                <CheckCircle2 className="h-5 w-5 text-chart-2 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="font-medium text-sm line-through text-muted-foreground">
-                      {task.title}
-                    </span>
-                    <Badge variant="outline" className={`text-xs ${typeColors[task.type]}`}>
-                      {typeLabels[task.type]}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                {task.completed && task.completedAt ? (
+                  <>
+                    <div className="flex items-center gap-1">
+                      <CheckCircle2 className="h-3 w-3 text-chart-2" />
+                      <span className="font-mono text-chart-2">完成 {task.completedAt}</span>
+                    </div>
                     <div className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
                       <span className="font-mono">计划 {task.scheduledTime}</span>
                     </div>
-                    {task.completedAt && (
-                      <div className="flex items-center gap-1">
-                        <CheckCircle2 className="h-3 w-3" />
-                        <span className="font-mono">完成 {task.completedAt}</span>
-                      </div>
-                    )}
+                  </>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-3 w-3" />
+                    <span className="font-mono">计划 {task.scheduledTime}</span>
                   </div>
-                </div>
+                )}
               </div>
-            ))}
+            </div>
           </div>
-        )}
+        ))}
 
         {tasks.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
