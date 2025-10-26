@@ -19,11 +19,11 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { taskTypeLabels } from "@/lib/translations";
 
 const defaultTaskTypes: TaskType[] = [
-  { value: "work", label: "工作 Work", labelEn: "Work" },
-  { value: "personal", label: "个人 Personal", labelEn: "Personal" },
-  { value: "health", label: "健康 Health", labelEn: "Health" },
-  { value: "learning", label: "学习 Learning", labelEn: "Learning" },
-  { value: "other", label: "其他 Other", labelEn: "Other" },
+  { value: "work", label: "工作", labelEn: "Work" },
+  { value: "personal", label: "个人", labelEn: "Personal" },
+  { value: "health", label: "健康", labelEn: "Health" },
+  { value: "learning", label: "学习", labelEn: "Learning" },
+  { value: "other", label: "其他", labelEn: "Other" },
 ];
 
 const frequencies = {
@@ -192,7 +192,7 @@ export function TaskForm() {
               <SelectContent>
                 {taskTypes.map((type) => (
                   <SelectItem key={type.value} value={type.value}>
-                    {type.label}
+                    {language === 'zh' ? type.label : type.labelEn}
                   </SelectItem>
                 ))}
               </SelectContent>

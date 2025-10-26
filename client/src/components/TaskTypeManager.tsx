@@ -29,7 +29,7 @@ export function TaskTypeManager({ taskTypes, onTaskTypesChange }: TaskTypeManage
   const [open, setOpen] = useState(false);
   const [newTypeLabelZh, setNewTypeLabelZh] = useState("");
   const [newTypeLabelEn, setNewTypeLabelEn] = useState("");
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const handleAddType = () => {
     if (!newTypeLabelZh.trim() || !newTypeLabelEn.trim()) return;
@@ -37,7 +37,7 @@ export function TaskTypeManager({ taskTypes, onTaskTypesChange }: TaskTypeManage
     const newValue = newTypeLabelEn.toLowerCase().replace(/\s+/g, "_");
     const newType: TaskType = {
       value: newValue,
-      label: `${newTypeLabelZh} ${newTypeLabelEn}`,
+      label: newTypeLabelZh,
       labelEn: newTypeLabelEn,
     };
 
@@ -84,7 +84,7 @@ export function TaskTypeManager({ taskTypes, onTaskTypesChange }: TaskTypeManage
                   data-testid={`task-type-item-${type.value}`}
                 >
                   <Badge variant="outline" className="text-sm">
-                    {type.label}
+                    {language === 'zh' ? type.label : type.labelEn}
                   </Badge>
                   <Button
                     type="button"
