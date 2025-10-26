@@ -482,4 +482,33 @@
   button:focus-visible {
     outline: none;
   }
+
+  /* iOS-style bottom tab bar */
+  .ios-tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 83px;
+    background: hsl(var(--background) / 0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid hsl(var(--border));
+    z-index: 50;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  /* Tab bar on desktop (within device frame) */
+  @media (min-width: 640px) {
+    .ios-tab-bar {
+      position: absolute;
+      max-width: 430px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+
+  /* Adjust main content to account for tab bar */
+  .has-tab-bar {
+    padding-bottom: 83px;
+  }
 }
