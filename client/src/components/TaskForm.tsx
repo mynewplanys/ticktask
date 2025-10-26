@@ -13,6 +13,8 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TaskTypeManager, type TaskType } from "@/components/TaskTypeManager";
+import { Plus, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const defaultTaskTypes: TaskType[] = [
   { value: "work", label: "工作 Work", labelEn: "Work" },
@@ -44,6 +46,12 @@ const reminderTypes = [
   { value: "overdue", label: "错过后提醒", description: "错过完成时间后提醒" },
 ];
 
+type CompletionTime = {
+  id: string;
+  hours: string;
+  minutes: string;
+};
+
 export function TaskForm() {
   const [taskTypes, setTaskTypes] = useState<TaskType[]>(defaultTaskTypes);
   const [title, setTitle] = useState("");
@@ -51,13 +59,31 @@ export function TaskForm() {
   const [taskType, setTaskType] = useState("");
   const [frequency, setFrequency] = useState("daily");
   const [weekday, setWeekday] = useState("1");
-  const [completionHours, setCompletionHours] = useState("18");
-  const [completionMinutes, setCompletionMinutes] = useState("0");
+  const [completionTimes, setCompletionTimes] = useState<CompletionTime[]>([
+    { id: "1", hours: "18", minutes: "0" }
+  ]);
   const [reminderType, setReminderType] = useState("advance");
   const [advanceType, setAdvanceType] = useState("minutes");
   const [advanceDays, setAdvanceDays] = useState("1");
   const [advanceMinutes, setAdvanceMinutes] = useState("30");
   const [overdueMinutes, setOverdueMinutes] = useState("10");
+
+  const addCompletionTime = () => {
+    const newId = String(Date.now());
+    setCompletionTimes([...completionTimes, { id: newId, hours: "18", minutes: "0" }]);
+  };
+
+  const removeCompletionTime = (id: string) => {
+    if (completionTimes.length > 1) {
+      setCompletionTimes(completionTimes.filter(t => t.id !== id));
+    }
+  };
+
+  const updateCompletionTime = (id: string, field: "hours" | "minutes", value: string) => {
+    setCompletionTimes(completionTimes.map(t => 
+      t.id === id ? { ...t, [field]: value } : t
+    ));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +93,7 @@ export function TaskForm() {
       taskType,
       frequency,
       weekday: frequency === "weekly" ? weekday : null,
-      completionTime: `${completionHours}:${completionMinutes}`,
+      completionTimes: completionTimes.map(t => `${t.hours}:${t.minutes}`),
       reminderType,
       advanceType: reminderType === "advance" ? advanceType : null,
       advanceDays: reminderType === "advance" && advanceType === "days" ? advanceDays : null,
@@ -189,43 +215,97 @@ export function TaskForm() {
           )}
 
           <div className="space-y-3">
-            <Label>应完成时间 Target Completion Time *</Label>
+            <div className="flex items-center justify-between">
+              <Label>应完成时间 Target Completion Time *</Label>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={addCompletionTime}
+                data-testid="button-add-time"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                添加时间 Add Time
+              </Button>
+            </div>
             <p className="text-sm text-muted-foreground">
               {getCompletionTimeLabel()}
             </p>
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <Label htmlFor="completion-hours" className="text-xs text-muted-foreground">小时 Hour</Label>
-                <Select value={completionHours} onValueChange={setCompletionHours}>
-                  <SelectTrigger id="completion-hours" data-testid="select-completion-hours">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Array.from({ length: 24 }, (_, i) => (
-                      <SelectItem key={i} value={String(i).padStart(2, "0")}>
-                        {String(i).padStart(2, "0")}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-end pb-2">:</div>
-              <div className="flex-1">
-                <Label htmlFor="completion-minutes" className="text-xs text-muted-foreground">分钟 Minute</Label>
-                <Select value={completionMinutes} onValueChange={setCompletionMinutes}>
-                  <SelectTrigger id="completion-minutes" data-testid="select-completion-minutes">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Array.from({ length: 12 }, (_, i) => i * 5).map((min) => (
-                      <SelectItem key={min} value={String(min).padStart(2, "0")}>
-                        {String(min).padStart(2, "0")}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            
+            <div className="space-y-3">
+              {completionTimes.map((time, index) => (
+                <div key={time.id} className="flex gap-3 items-end">
+                  <div className="flex-1">
+                    {index === 0 && (
+                      <Label htmlFor={`completion-hours-${time.id}`} className="text-xs text-muted-foreground">
+                        小时 Hour
+                      </Label>
+                    )}
+                    <Select 
+                      value={time.hours} 
+                      onValueChange={(value) => updateCompletionTime(time.id, "hours", value)}
+                    >
+                      <SelectTrigger id={`completion-hours-${time.id}`} data-testid={`select-completion-hours-${index}`}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Array.from({ length: 24 }, (_, i) => (
+                          <SelectItem key={i} value={String(i).padStart(2, "0")}>
+                            {String(i).padStart(2, "0")}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="pb-2">:</div>
+                  <div className="flex-1">
+                    {index === 0 && (
+                      <Label htmlFor={`completion-minutes-${time.id}`} className="text-xs text-muted-foreground">
+                        分钟 Minute
+                      </Label>
+                    )}
+                    <Select 
+                      value={time.minutes} 
+                      onValueChange={(value) => updateCompletionTime(time.id, "minutes", value)}
+                    >
+                      <SelectTrigger id={`completion-minutes-${time.id}`} data-testid={`select-completion-minutes-${index}`}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Array.from({ length: 12 }, (_, i) => i * 5).map((min) => (
+                          <SelectItem key={min} value={String(min).padStart(2, "0")}>
+                            {String(min).padStart(2, "0")}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {completionTimes.length > 1 && (
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => removeCompletionTime(time.id)}
+                      className="flex-shrink-0"
+                      data-testid={`button-remove-time-${index}`}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  )}
+                </div>
+              ))}
             </div>
+
+            {completionTimes.length > 1 && (
+              <div className="flex flex-wrap gap-2 pt-2">
+                <span className="text-xs text-muted-foreground">已添加的时间 Added times:</span>
+                {completionTimes.map((time) => (
+                  <Badge key={time.id} variant="secondary" className="text-xs font-mono">
+                    {time.hours}:{time.minutes}
+                  </Badge>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="space-y-3">
