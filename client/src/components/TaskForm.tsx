@@ -73,6 +73,21 @@ export function TaskForm() {
     });
   };
 
+  const getCompletionTimeLabel = () => {
+    switch (frequency) {
+      case "daily":
+        return "当天应在此时间完成任务 Task should be completed by this time today";
+      case "weekly":
+        return "每周应在此时间完成任务 Task should be completed by this time each week";
+      case "monthly":
+        return "每月应在此时间完成任务 Task should be completed by this time each month";
+      case "yearly":
+        return "每年应在此时间完成任务 Task should be completed by this time each year";
+      default:
+        return "应在此时间完成任务 Task should be completed by this time";
+    }
+  };
+
   return (
     <Card className="max-w-2xl mx-auto">
       <CardHeader>
@@ -170,47 +185,45 @@ export function TaskForm() {
             </div>
           )}
 
-          {frequency === "daily" && (
-            <div className="space-y-3">
-              <Label>应完成时间 Target Completion Time</Label>
-              <p className="text-sm text-muted-foreground">
-                当天应在此时间完成任务 Task should be completed by this time today
-              </p>
-              <div className="flex gap-3">
-                <div className="flex-1">
-                  <Label htmlFor="completion-hours" className="text-xs text-muted-foreground">小时 Hour</Label>
-                  <Select value={completionHours} onValueChange={setCompletionHours}>
-                    <SelectTrigger id="completion-hours" data-testid="select-completion-hours">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Array.from({ length: 24 }, (_, i) => (
-                        <SelectItem key={i} value={String(i).padStart(2, "0")}>
-                          {String(i).padStart(2, "0")}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-end pb-2">:</div>
-                <div className="flex-1">
-                  <Label htmlFor="completion-minutes" className="text-xs text-muted-foreground">分钟 Minute</Label>
-                  <Select value={completionMinutes} onValueChange={setCompletionMinutes}>
-                    <SelectTrigger id="completion-minutes" data-testid="select-completion-minutes">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Array.from({ length: 12 }, (_, i) => i * 5).map((min) => (
-                        <SelectItem key={min} value={String(min).padStart(2, "0")}>
-                          {String(min).padStart(2, "0")}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+          <div className="space-y-3">
+            <Label>应完成时间 Target Completion Time *</Label>
+            <p className="text-sm text-muted-foreground">
+              {getCompletionTimeLabel()}
+            </p>
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <Label htmlFor="completion-hours" className="text-xs text-muted-foreground">小时 Hour</Label>
+                <Select value={completionHours} onValueChange={setCompletionHours}>
+                  <SelectTrigger id="completion-hours" data-testid="select-completion-hours">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 24 }, (_, i) => (
+                      <SelectItem key={i} value={String(i).padStart(2, "0")}>
+                        {String(i).padStart(2, "0")}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-end pb-2">:</div>
+              <div className="flex-1">
+                <Label htmlFor="completion-minutes" className="text-xs text-muted-foreground">分钟 Minute</Label>
+                <Select value={completionMinutes} onValueChange={setCompletionMinutes}>
+                  <SelectTrigger id="completion-minutes" data-testid="select-completion-minutes">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 12 }, (_, i) => i * 5).map((min) => (
+                      <SelectItem key={min} value={String(min).padStart(2, "0")}>
+                        {String(min).padStart(2, "0")}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-          )}
+          </div>
 
           <div className="space-y-3">
             <Label>提醒方式 Reminder Type</Label>
