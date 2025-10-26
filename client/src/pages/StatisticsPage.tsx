@@ -72,9 +72,25 @@ export default function StatisticsPage() {
   const [records] = useState<StatisticsRecord[]>(mockRecords);
   const [filters, setFilters] = useState<FilterState | null>(null);
 
-  const completedCount = records.filter((r) => r.status === "completed").length;
-  const missedCount = records.filter((r) => r.status === "missed").length;
-  const totalCount = records.length;
+  const filteredRecords = records.filter((record) => {
+    if (!filters) return true;
+
+    // Filter by date range
+    if (filters.startDate && record.date < filters.startDate) return false;
+    if (filters.endDate && record.date > filters.endDate) return false;
+
+    // Filter by task type
+    if (filters.taskType !== "all" && record.taskType !== filters.taskType) return false;
+
+    // Filter by status
+    if (filters.status !== "all" && record.status !== filters.status) return false;
+
+    return true;
+  });
+
+  const completedCount = filteredRecords.filter((r) => r.status === "completed").length;
+  const missedCount = filteredRecords.filter((r) => r.status === "missed").length;
+  const totalCount = filteredRecords.length;
   const completionRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   const handleFilterChange = (newFilters: FilterState) => {
@@ -132,7 +148,7 @@ export default function StatisticsPage() {
             </Card>
           </div>
 
-          <StatisticsTable records={records} />
+          <StatisticsTable records={filteredRecords} />
         </div>
       </div>
     </div>

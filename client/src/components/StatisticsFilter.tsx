@@ -23,10 +23,18 @@ const taskTypes = [
   { value: "other", label: "其他 Other" },
 ];
 
+const statusTypes = [
+  { value: "all", label: "全部状态 All Status" },
+  { value: "completed", label: "已完成 Completed" },
+  { value: "missed", label: "已错过 Missed" },
+  { value: "pending", label: "待完成 Pending" },
+];
+
 export type FilterState = {
   startDate: Date | undefined;
   endDate: Date | undefined;
   taskType: string;
+  status: string;
   timeGroup: string;
 };
 
@@ -38,10 +46,11 @@ export function StatisticsFilter({ onFilterChange }: StatisticsFilterProps) {
   const [startDate, setStartDate] = useState<Date | undefined>(new Date(new Date().setDate(new Date().getDate() - 30)));
   const [endDate, setEndDate] = useState<Date | undefined>(new Date());
   const [taskType, setTaskType] = useState("all");
+  const [status, setStatus] = useState("all");
   const [timeGroup, setTimeGroup] = useState("day");
 
   const handleApply = () => {
-    const filters = { startDate, endDate, taskType, timeGroup };
+    const filters = { startDate, endDate, taskType, status, timeGroup };
     console.log("Filters applied:", filters);
     if (onFilterChange) {
       onFilterChange(filters);
@@ -107,6 +116,22 @@ export function StatisticsFilter({ onFilterChange }: StatisticsFilterProps) {
             </SelectTrigger>
             <SelectContent>
               {taskTypes.map((type) => (
+                <SelectItem key={type.value} value={type.value}>
+                  {type.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex-1 min-w-[200px] space-y-2">
+          <Label htmlFor="status">完成状态 Status</Label>
+          <Select value={status} onValueChange={setStatus}>
+            <SelectTrigger id="status" data-testid="select-filter-status">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {statusTypes.map((type) => (
                 <SelectItem key={type.value} value={type.value}>
                   {type.label}
                 </SelectItem>
