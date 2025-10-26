@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TaskTypeManager, type TaskType } from "@/components/TaskTypeManager";
 import { Plus, Trash2 } from "lucide-react";
@@ -41,7 +42,7 @@ const frequencies = {
   ],
 };
 
-const weekdays = {
+const weekdayOptions = {
   zh: [
     { value: "1", label: "周一" },
     { value: "2", label: "周二" },
@@ -85,7 +86,7 @@ export function TaskForm() {
   const [description, setDescription] = useState("");
   const [taskType, setTaskType] = useState("");
   const [frequency, setFrequency] = useState("daily");
-  const [weekday, setWeekday] = useState("1");
+  const [weekdays, setWeekdays] = useState<string[]>(["1"]);
   const [completionTimes, setCompletionTimes] = useState<CompletionTime[]>([
     { id: "1", hours: "18", minutes: "0" }
   ]);
@@ -113,6 +114,18 @@ export function TaskForm() {
     ));
   };
 
+  const toggleWeekday = (day: string) => {
+    setWeekdays(prev => {
+      if (prev.includes(day)) {
+        // 至少保留一个选项
+        if (prev.length === 1) return prev;
+        return prev.filter(d => d !== day);
+      } else {
+        return [...prev, day].sort();
+      }
+    });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Task submitted:", {
@@ -120,7 +133,7 @@ export function TaskForm() {
       description,
       taskType,
       frequency,
-      weekday: frequency === "weekly" ? weekday : null,
+      weekdays: frequency === "weekly" ? weekdays : null,
       completionTimes: completionTimes.map(t => `${t.hours}:${t.minutes}`),
       reminderType,
       advanceType: reminderType === "advance" ? advanceType : null,
@@ -225,20 +238,51 @@ export function TaskForm() {
           </div>
 
           {frequency === "weekly" && (
-            <div className="space-y-2">
-              <Label htmlFor="weekday">{t("选择星期", "Select Weekday")} *</Label>
-              <Select value={weekday} onValueChange={setWeekday}>
-                <SelectTrigger id="weekday" data-testid="select-weekday">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {weekdays[language].map((day) => (
-                    <SelectItem key={day.value} value={day.value}>
+            <div className="space-y-3">
+              <Label>{t("选择星期", "Select Weekdays")} *</Label>
+              <p className="text-sm text-muted-foreground">
+                {t("可以选择多个星期", "You can select multiple days")}
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {weekdayOptions[language].map((day) => (
+                  <div
+                    key={day.value}
+                    className="flex items-center space-x-2"
+                  >
+                    <Checkbox
+                      id={`weekday-${day.value}`}
+                      checked={weekdays.includes(day.value)}
+                      onCheckedChange={() => toggleWeekday(day.value)}
+                      data-testid={`checkbox-weekday-${day.value}`}
+                    />
+                    <Label
+                      htmlFor={`weekday-${day.value}`}
+                      className="text-sm font-normal cursor-pointer"
+                    >
                       {day.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    </Label>
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <span className="text-xs text-muted-foreground">
+                  {t("已选择", "Selected")}:
+                </span>
+                {weekdays.length > 0 ? (
+                  weekdays.map((dayValue) => {
+                    const dayLabel = weekdayOptions[language].find(d => d.value === dayValue)?.label;
+                    return (
+                      <Badge key={dayValue} variant="secondary" className="text-xs">
+                        {dayLabel}
+                      </Badge>
+                    );
+                  })
+                ) : (
+                  <span className="text-xs text-muted-foreground">
+                    {t("请至少选择一天", "Please select at least one day")}
+                  </span>
+                )}
+              </div>
             </div>
           )}
 
