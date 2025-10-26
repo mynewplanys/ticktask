@@ -31,7 +31,7 @@ const frequencies = [
 
 const reminderTypes = [
   { value: "fixed", label: "固定时间提醒", description: "在设定的时间提醒" },
-  { value: "overdue", label: "错过后提醒", description: "错过完成时间10分钟后提醒" },
+  { value: "overdue", label: "错过后提醒", description: "错过完成时间后提醒" },
 ];
 
 export function TaskForm() {
@@ -45,6 +45,7 @@ export function TaskForm() {
   const [reminderType, setReminderType] = useState("fixed");
   const [reminderHours, setReminderHours] = useState("9");
   const [reminderMinutes, setReminderMinutes] = useState("0");
+  const [overdueMinutes, setOverdueMinutes] = useState("10");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,6 +57,7 @@ export function TaskForm() {
       completionTime: `${completionHours}:${completionMinutes}`,
       reminderType,
       reminderTime: reminderType === "fixed" ? `${reminderHours}:${reminderMinutes}` : null,
+      overdueMinutes: reminderType === "overdue" ? overdueMinutes : null,
     });
   };
 
@@ -241,6 +243,25 @@ export function TaskForm() {
                   </Select>
                 </div>
               </div>
+            </div>
+          )}
+
+          {reminderType === "overdue" && (
+            <div className="space-y-2">
+              <Label htmlFor="overdue-minutes">错过后提醒延迟 Overdue Reminder Delay (分钟 minutes)</Label>
+              <Input
+                id="overdue-minutes"
+                type="number"
+                min="1"
+                max="1440"
+                value={overdueMinutes}
+                onChange={(e) => setOverdueMinutes(e.target.value)}
+                placeholder="输入延迟分钟数"
+                data-testid="input-overdue-minutes"
+              />
+              <p className="text-xs text-muted-foreground">
+                错过完成时间后 {overdueMinutes} 分钟提醒 · Remind {overdueMinutes} minutes after missing the deadline
+              </p>
             </div>
           )}
 
