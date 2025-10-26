@@ -28,14 +28,21 @@ const frequencies = [
   { value: "yearly", label: "每年 Yearly", description: "每年重复" },
 ];
 
+const reminderTypes = [
+  { value: "fixed", label: "固定时间提醒", description: "在设定的时间提醒" },
+  { value: "overdue", label: "错过后提醒", description: "错过完成时间10分钟后提醒" },
+];
+
 export function TaskForm() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [taskType, setTaskType] = useState("");
   const [frequency, setFrequency] = useState("daily");
+  const [completionHours, setCompletionHours] = useState("18");
+  const [completionMinutes, setCompletionMinutes] = useState("0");
+  const [reminderType, setReminderType] = useState("fixed");
   const [reminderHours, setReminderHours] = useState("9");
   const [reminderMinutes, setReminderMinutes] = useState("0");
-  const [advanceMinutes, setAdvanceMinutes] = useState("30");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,8 +51,9 @@ export function TaskForm() {
       description,
       taskType,
       frequency,
-      reminderTime: `${reminderHours}:${reminderMinutes}`,
-      advanceMinutes,
+      completionTime: `${completionHours}:${completionMinutes}`,
+      reminderType,
+      reminderTime: reminderType === "fixed" ? `${reminderHours}:${reminderMinutes}` : null,
     });
   };
 
@@ -122,54 +130,111 @@ export function TaskForm() {
             </RadioGroup>
           </div>
 
-          <div className="space-y-3">
-            <Label>提醒时间 Reminder Time</Label>
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <Label htmlFor="hours" className="text-xs text-muted-foreground">小时 Hour</Label>
-                <Select value={reminderHours} onValueChange={setReminderHours}>
-                  <SelectTrigger id="hours" data-testid="select-reminder-hours">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Array.from({ length: 24 }, (_, i) => (
-                      <SelectItem key={i} value={String(i).padStart(2, "0")}>
-                        {String(i).padStart(2, "0")}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-end pb-2">:</div>
-              <div className="flex-1">
-                <Label htmlFor="minutes" className="text-xs text-muted-foreground">分钟 Minute</Label>
-                <Select value={reminderMinutes} onValueChange={setReminderMinutes}>
-                  <SelectTrigger id="minutes" data-testid="select-reminder-minutes">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Array.from({ length: 12 }, (_, i) => i * 5).map((min) => (
-                      <SelectItem key={min} value={String(min).padStart(2, "0")}>
-                        {String(min).padStart(2, "0")}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+          {frequency === "daily" && (
+            <div className="space-y-3">
+              <Label>应完成时间 Target Completion Time</Label>
+              <p className="text-sm text-muted-foreground">
+                当天应在此时间完成任务 Task should be completed by this time today
+              </p>
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <Label htmlFor="completion-hours" className="text-xs text-muted-foreground">小时 Hour</Label>
+                  <Select value={completionHours} onValueChange={setCompletionHours}>
+                    <SelectTrigger id="completion-hours" data-testid="select-completion-hours">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.from({ length: 24 }, (_, i) => (
+                        <SelectItem key={i} value={String(i).padStart(2, "0")}>
+                          {String(i).padStart(2, "0")}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-end pb-2">:</div>
+                <div className="flex-1">
+                  <Label htmlFor="completion-minutes" className="text-xs text-muted-foreground">分钟 Minute</Label>
+                  <Select value={completionMinutes} onValueChange={setCompletionMinutes}>
+                    <SelectTrigger id="completion-minutes" data-testid="select-completion-minutes">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.from({ length: 12 }, (_, i) => i * 5).map((min) => (
+                        <SelectItem key={min} value={String(min).padStart(2, "0")}>
+                          {String(min).padStart(2, "0")}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
+          )}
+
+          <div className="space-y-3">
+            <Label>提醒方式 Reminder Type</Label>
+            <RadioGroup value={reminderType} onValueChange={setReminderType}>
+              <div className="space-y-3">
+                {reminderTypes.map((type) => (
+                  <div key={type.value}>
+                    <RadioGroupItem
+                      value={type.value}
+                      id={type.value}
+                      className="peer sr-only"
+                    />
+                    <Label
+                      htmlFor={type.value}
+                      className="flex flex-col gap-1 rounded-lg border-2 border-muted bg-card p-4 hover-elevate cursor-pointer peer-data-[state=checked]:border-primary"
+                      data-testid={`radio-reminder-type-${type.value}`}
+                    >
+                      <span className="font-medium">{type.label}</span>
+                      <span className="text-xs text-muted-foreground">{type.description}</span>
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </RadioGroup>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="advance">提前通知 Advance Notice (minutes)</Label>
-            <Input
-              id="advance"
-              type="number"
-              min="0"
-              value={advanceMinutes}
-              onChange={(e) => setAdvanceMinutes(e.target.value)}
-              data-testid="input-advance-minutes"
-            />
-          </div>
+          {reminderType === "fixed" && (
+            <div className="space-y-3">
+              <Label>固定提醒时间 Fixed Reminder Time</Label>
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <Label htmlFor="reminder-hours" className="text-xs text-muted-foreground">小时 Hour</Label>
+                  <Select value={reminderHours} onValueChange={setReminderHours}>
+                    <SelectTrigger id="reminder-hours" data-testid="select-reminder-hours">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.from({ length: 24 }, (_, i) => (
+                        <SelectItem key={i} value={String(i).padStart(2, "0")}>
+                          {String(i).padStart(2, "0")}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-end pb-2">:</div>
+                <div className="flex-1">
+                  <Label htmlFor="reminder-minutes" className="text-xs text-muted-foreground">分钟 Minute</Label>
+                  <Select value={reminderMinutes} onValueChange={setReminderMinutes}>
+                    <SelectTrigger id="reminder-minutes" data-testid="select-reminder-minutes">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.from({ length: 12 }, (_, i) => i * 5).map((min) => (
+                        <SelectItem key={min} value={String(min).padStart(2, "0")}>
+                          {String(min).padStart(2, "0")}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="flex gap-3 justify-end">
             <Button
@@ -180,6 +245,7 @@ export function TaskForm() {
                 setDescription("");
                 setTaskType("");
                 setFrequency("daily");
+                setReminderType("fixed");
                 console.log("Form reset");
               }}
               data-testid="button-reset"
