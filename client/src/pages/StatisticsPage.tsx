@@ -10,6 +10,7 @@ const mockRecords: StatisticsRecord[] = [
     taskTitle: "晨间锻炼 Morning Exercise",
     taskType: "health",
     status: "completed",
+    completedAt: "07:15",
   },
   {
     id: "2",
@@ -17,6 +18,7 @@ const mockRecords: StatisticsRecord[] = [
     taskTitle: "团队会议 Team Meeting",
     taskType: "work",
     status: "completed",
+    completedAt: "10:45",
   },
   {
     id: "3",
@@ -31,6 +33,7 @@ const mockRecords: StatisticsRecord[] = [
     taskTitle: "读书 Reading",
     taskType: "personal",
     status: "completed",
+    completedAt: "20:30",
   },
   {
     id: "5",
@@ -45,6 +48,7 @@ const mockRecords: StatisticsRecord[] = [
     taskTitle: "晨间锻炼 Morning Exercise",
     taskType: "health",
     status: "completed",
+    completedAt: "07:20",
   },
   {
     id: "7",
@@ -52,6 +56,7 @@ const mockRecords: StatisticsRecord[] = [
     taskTitle: "团队会议 Team Meeting",
     taskType: "work",
     status: "completed",
+    completedAt: "10:30",
   },
   {
     id: "8",
@@ -59,6 +64,7 @@ const mockRecords: StatisticsRecord[] = [
     taskTitle: "学习新技术 Learn New Tech",
     taskType: "learning",
     status: "completed",
+    completedAt: "19:00",
   },
 ];
 

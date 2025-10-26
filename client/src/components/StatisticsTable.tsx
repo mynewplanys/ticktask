@@ -15,6 +15,7 @@ export type StatisticsRecord = {
   taskTitle: string;
   taskType: string;
   status: "completed" | "missed" | "pending";
+  completedAt?: string;
 };
 
 type StatisticsTableProps = {
@@ -79,7 +80,14 @@ export function StatisticsTable({ records }: StatisticsTableProps) {
           {records.map((record) => (
             <TableRow key={record.id} className="hover-elevate" data-testid={`row-stat-${record.id}`}>
               <TableCell className="font-mono text-sm" data-testid={`text-date-${record.id}`}>
-                {format(record.date, "yyyy-MM-dd")}
+                <div className="flex flex-col">
+                  <span>{format(record.date, "yyyy-MM-dd")}</span>
+                  {record.completedAt && (
+                    <span className="text-xs text-chart-2 mt-1">
+                      完成 {record.completedAt}
+                    </span>
+                  )}
+                </div>
               </TableCell>
               <TableCell className="font-medium" data-testid={`text-task-${record.id}`}>
                 {record.taskTitle}
