@@ -1,5 +1,8 @@
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Clock, CheckCircle2, Circle, XCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export type TaskPreview = {
   id: string;
@@ -76,9 +79,43 @@ const mockTasks: TaskPreview[] = [
 ];
 
 export default function TodayPage() {
-  const tasks = mockTasks;
+  const [tasks, setTasks] = useState<TaskPreview[]>(mockTasks);
+  const { toast } = useToast();
+  
   const pendingCount = tasks.filter(t => !t.completed).length;
   const completedCount = tasks.filter(t => t.completed).length;
+
+  const handleToggleComplete = (taskId: string) => {
+    setTasks(prevTasks => 
+      prevTasks.map(task => {
+        if (task.id === taskId) {
+          const newCompleted = !task.completed;
+          const now = new Date();
+          const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+          
+          if (newCompleted) {
+            toast({
+              title: "任务已完成 Task Completed",
+              description: `${task.title} - ${currentTime}`,
+            });
+          } else {
+            toast({
+              title: "取消完成 Uncompleted",
+              description: task.title,
+              variant: "destructive",
+            });
+          }
+          
+          return {
+            ...task,
+            completed: newCompleted,
+            completedAt: newCompleted ? currentTime : undefined,
+          };
+        }
+        return task;
+      })
+    );
+  };
 
   const sortedTasks = [...tasks].sort((a, b) => {
     const timeA = a.completed && a.completedAt ? a.completedAt : a.scheduledTime;
@@ -113,13 +150,21 @@ export default function TodayPage() {
               }`}
               data-testid={`today-task-${task.id}`}
             >
-              {task.completed ? (
-                <CheckCircle2 className="h-5 w-5 text-chart-2 flex-shrink-0" />
-              ) : isMissed ? (
-                <XCircle className="h-5 w-5 text-destructive flex-shrink-0" />
-              ) : (
-                <Circle className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-              )}
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => handleToggleComplete(task.id)}
+                className="flex-shrink-0 h-8 w-8"
+                data-testid={`button-toggle-${task.id}`}
+              >
+                {task.completed ? (
+                  <CheckCircle2 className="h-5 w-5 text-chart-2" />
+                ) : isMissed ? (
+                  <XCircle className="h-5 w-5 text-destructive" />
+                ) : (
+                  <Circle className="h-5 w-5 text-muted-foreground" />
+                )}
+              </Button>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap mb-1">
                   <span
