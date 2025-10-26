@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { TaskForm } from "@/components/TaskForm";
-import { TaskList, type Task } from "@/components/TaskList";
 import { TodayTaskPreview, type TaskPreview } from "@/components/TodayTaskPreview";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function TasksPage() {
-  const [tasks, setTasks] = useState<Task[]>([
+  const [tasks] = useState([
     {
       id: "1",
       title: "晨间锻炼 Morning Exercise",
@@ -40,14 +38,6 @@ export default function TasksPage() {
     },
   ]);
 
-  const handleToggleComplete = (taskId: string) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      )
-    );
-  };
-
   const todayPreviewTasks: TaskPreview[] = tasks.map(task => ({
     id: task.id,
     title: task.title,
@@ -67,26 +57,8 @@ export default function TasksPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2">
           <TaskForm />
-
-          <Card>
-            <CardHeader>
-              <CardTitle>今日任务 Today's Tasks</CardTitle>
-              <CardDescription>
-                完成今天的任务以保持进度 Complete today's tasks to stay on track
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {tasks.length > 0 ? (
-                <TaskList tasks={tasks} onToggleComplete={handleToggleComplete} />
-              ) : (
-                <div className="text-center py-12 text-muted-foreground">
-                  <p>暂无任务 No tasks yet</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
         </div>
 
         <div>
