@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Settings, Plus, Trash2 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export type TaskType = {
   value: string;
@@ -28,6 +29,7 @@ export function TaskTypeManager({ taskTypes, onTaskTypesChange }: TaskTypeManage
   const [open, setOpen] = useState(false);
   const [newTypeLabelZh, setNewTypeLabelZh] = useState("");
   const [newTypeLabelEn, setNewTypeLabelEn] = useState("");
+  const { t } = useLanguage();
 
   const handleAddType = () => {
     if (!newTypeLabelZh.trim() || !newTypeLabelEn.trim()) return;
@@ -60,20 +62,20 @@ export function TaskTypeManager({ taskTypes, onTaskTypesChange }: TaskTypeManage
           data-testid="button-manage-task-types"
         >
           <Settings className="h-4 w-4 mr-2" />
-          管理任务类型 Manage Types
+          {t("管理任务类型", "Manage Types")}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>任务类型管理 Task Type Management</DialogTitle>
+          <DialogTitle>{t("任务类型管理", "Task Type Management")}</DialogTitle>
           <DialogDescription>
-            添加、删除或修改任务类型 Add, delete or modify task types
+            {t("添加、删除或修改任务类型", "Add, delete or modify task types")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
           <div className="space-y-3">
-            <Label>现有任务类型 Existing Types</Label>
+            <Label>{t("现有任务类型", "Existing Types")}</Label>
             <div className="space-y-2 max-h-60 overflow-y-auto">
               {taskTypes.map((type) => (
                 <div
@@ -99,15 +101,15 @@ export function TaskTypeManager({ taskTypes, onTaskTypesChange }: TaskTypeManage
           </div>
 
           <div className="space-y-3">
-            <Label>添加新类型 Add New Type</Label>
+            <Label>{t("添加新类型", "Add New Type")}</Label>
             <div className="space-y-3">
               <div className="space-y-2">
                 <Label htmlFor="new-type-zh" className="text-xs text-muted-foreground">
-                  中文名称 Chinese Name
+                  {t("中文名称", "Chinese Name")}
                 </Label>
                 <Input
                   id="new-type-zh"
-                  placeholder="例如：运动"
+                  placeholder={t("例如：运动", "e.g.: Exercise")}
                   value={newTypeLabelZh}
                   onChange={(e) => setNewTypeLabelZh(e.target.value)}
                   data-testid="input-new-type-zh"
@@ -115,11 +117,11 @@ export function TaskTypeManager({ taskTypes, onTaskTypesChange }: TaskTypeManage
               </div>
               <div className="space-y-2">
                 <Label htmlFor="new-type-en" className="text-xs text-muted-foreground">
-                  英文名称 English Name
+                  {t("英文名称", "English Name")}
                 </Label>
                 <Input
                   id="new-type-en"
-                  placeholder="例如：Exercise"
+                  placeholder={t("例如：Exercise", "e.g.: Exercise")}
                   value={newTypeLabelEn}
                   onChange={(e) => setNewTypeLabelEn(e.target.value)}
                   data-testid="input-new-type-en"
@@ -133,7 +135,7 @@ export function TaskTypeManager({ taskTypes, onTaskTypesChange }: TaskTypeManage
                 data-testid="button-add-type"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                添加类型 Add Type
+                {t("添加类型", "Add Type")}
               </Button>
             </div>
           </div>

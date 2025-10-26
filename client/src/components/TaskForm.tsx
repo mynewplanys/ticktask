@@ -26,27 +26,52 @@ const defaultTaskTypes: TaskType[] = [
   { value: "other", label: "其他 Other", labelEn: "Other" },
 ];
 
-const frequencies = [
-  { value: "daily", label: "每日 Daily", description: "每天重复" },
-  { value: "weekly", label: "每周 Weekly", description: "每周重复" },
-  { value: "monthly", label: "每月 Monthly", description: "每月重复" },
-  { value: "yearly", label: "每年 Yearly", description: "每年重复" },
-];
+const frequencies = {
+  zh: [
+    { value: "daily", label: "每日", description: "每天重复" },
+    { value: "weekly", label: "每周", description: "每周重复" },
+    { value: "monthly", label: "每月", description: "每月重复" },
+    { value: "yearly", label: "每年", description: "每年重复" },
+  ],
+  en: [
+    { value: "daily", label: "Daily", description: "Repeat every day" },
+    { value: "weekly", label: "Weekly", description: "Repeat every week" },
+    { value: "monthly", label: "Monthly", description: "Repeat every month" },
+    { value: "yearly", label: "Yearly", description: "Repeat every year" },
+  ],
+};
 
-const weekdays = [
-  { value: "1", label: "周一 Monday" },
-  { value: "2", label: "周二 Tuesday" },
-  { value: "3", label: "周三 Wednesday" },
-  { value: "4", label: "周四 Thursday" },
-  { value: "5", label: "周五 Friday" },
-  { value: "6", label: "周六 Saturday" },
-  { value: "0", label: "周日 Sunday" },
-];
+const weekdays = {
+  zh: [
+    { value: "1", label: "周一" },
+    { value: "2", label: "周二" },
+    { value: "3", label: "周三" },
+    { value: "4", label: "周四" },
+    { value: "5", label: "周五" },
+    { value: "6", label: "周六" },
+    { value: "0", label: "周日" },
+  ],
+  en: [
+    { value: "1", label: "Monday" },
+    { value: "2", label: "Tuesday" },
+    { value: "3", label: "Wednesday" },
+    { value: "4", label: "Thursday" },
+    { value: "5", label: "Friday" },
+    { value: "6", label: "Saturday" },
+    { value: "0", label: "Sunday" },
+  ],
+};
 
-const reminderTypes = [
-  { value: "advance", label: "提前提醒", description: "在完成时间之前提醒" },
-  { value: "overdue", label: "错过后提醒", description: "错过完成时间后提醒" },
-];
+const reminderTypes = {
+  zh: [
+    { value: "advance", label: "提前提醒", description: "在完成时间之前提醒" },
+    { value: "overdue", label: "错过后提醒", description: "错过完成时间后提醒" },
+  ],
+  en: [
+    { value: "advance", label: "Advance Reminder", description: "Remind before completion time" },
+    { value: "overdue", label: "Overdue Reminder", description: "Remind after missing deadline" },
+  ],
+};
 
 type CompletionTime = {
   id: string;
@@ -178,7 +203,7 @@ export function TaskForm() {
             <Label>{t("重复频率", "Frequency")} *</Label>
             <RadioGroup value={frequency} onValueChange={setFrequency}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {frequencies.map((freq) => (
+                {frequencies[language].map((freq) => (
                   <div key={freq.value}>
                     <RadioGroupItem
                       value={freq.value}
@@ -207,7 +232,7 @@ export function TaskForm() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {weekdays.map((day) => (
+                  {weekdays[language].map((day) => (
                     <SelectItem key={day.value} value={day.value}>
                       {day.label}
                     </SelectItem>
@@ -315,7 +340,7 @@ export function TaskForm() {
             <Label>{t("提醒方式", "Reminder Type")}</Label>
             <RadioGroup value={reminderType} onValueChange={setReminderType}>
               <div className="space-y-3">
-                {reminderTypes.map((type) => (
+                {reminderTypes[language].map((type) => (
                   <div key={type.value}>
                     <RadioGroupItem
                       value={type.value}
@@ -345,14 +370,14 @@ export function TaskForm() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="days">提前x天 (x Days in advance)</SelectItem>
-                    <SelectItem value="minutes">当天提前x分钟提醒 (x Minutes before in same day)</SelectItem>
+                    <SelectItem value="days">{t("提前x天", "x Days in advance")}</SelectItem>
+                    <SelectItem value="minutes">{t("当天提前x分钟提醒", "x Minutes before in same day")}</SelectItem>
                   </SelectContent>
                 </Select>
 
                 {advanceType === "days" && (
                   <div className="space-y-2">
-                    <Label htmlFor="advance-days">提前天数 Days in Advance</Label>
+                    <Label htmlFor="advance-days">{t("提前天数", "Days in Advance")}</Label>
                     <Input
                       id="advance-days"
                       type="number"
@@ -360,18 +385,18 @@ export function TaskForm() {
                       max="365"
                       value={advanceDays}
                       onChange={(e) => setAdvanceDays(e.target.value)}
-                      placeholder="输入提前天数"
+                      placeholder={t("输入提前天数", "Enter days")}
                       data-testid="input-advance-days"
                     />
                     <p className="text-xs text-muted-foreground">
-                      提前 {advanceDays} 天提醒 · Remind {advanceDays} day(s) in advance
+                      {t(`提前 ${advanceDays} 天提醒`, `Remind ${advanceDays} day(s) in advance`)}
                     </p>
                   </div>
                 )}
 
                 {advanceType === "minutes" && (
                   <div className="space-y-2">
-                    <Label htmlFor="advance-minutes">提前分钟数 Minutes in Advance</Label>
+                    <Label htmlFor="advance-minutes">{t("提前分钟数", "Minutes in Advance")}</Label>
                     <Input
                       id="advance-minutes"
                       type="number"
@@ -379,11 +404,11 @@ export function TaskForm() {
                       max="1440"
                       value={advanceMinutes}
                       onChange={(e) => setAdvanceMinutes(e.target.value)}
-                      placeholder="输入提前分钟数"
+                      placeholder={t("输入提前分钟数", "Enter minutes")}
                       data-testid="input-advance-minutes"
                     />
                     <p className="text-xs text-muted-foreground">
-                      当日提前 {advanceMinutes} 分钟提醒 · Remind {advanceMinutes} minute(s) before on the same day
+                      {t(`当日提前 ${advanceMinutes} 分钟提醒`, `Remind ${advanceMinutes} minute(s) before on the same day`)}
                     </p>
                   </div>
                 )}
@@ -393,7 +418,7 @@ export function TaskForm() {
 
           {reminderType === "overdue" && (
             <div className="space-y-2">
-              <Label htmlFor="overdue-minutes">错过后提醒延迟 Overdue Reminder Delay (分钟 minutes)</Label>
+              <Label htmlFor="overdue-minutes">{t("错过后提醒延迟（分钟）", "Overdue Reminder Delay (minutes)")}</Label>
               <Input
                 id="overdue-minutes"
                 type="number"
@@ -401,11 +426,11 @@ export function TaskForm() {
                 max="1440"
                 value={overdueMinutes}
                 onChange={(e) => setOverdueMinutes(e.target.value)}
-                placeholder="输入延迟分钟数"
+                placeholder={t("输入延迟分钟数", "Enter minutes")}
                 data-testid="input-overdue-minutes"
               />
               <p className="text-xs text-muted-foreground">
-                错过完成时间后 {overdueMinutes} 分钟提醒 · Remind {overdueMinutes} minutes after missing the deadline
+                {t(`错过完成时间后 ${overdueMinutes} 分钟提醒`, `Remind ${overdueMinutes} minutes after missing the deadline`)}
               </p>
             </div>
           )}
