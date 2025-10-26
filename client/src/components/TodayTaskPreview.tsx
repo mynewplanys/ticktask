@@ -107,6 +107,11 @@ export function TodayTaskPreview({ tasks }: TodayTaskPreviewProps) {
                       错过 Missed
                     </Badge>
                   )}
+                  {!task.completed && !isMissed && (
+                    <Badge className="text-xs bg-primary text-white border-0">
+                      待完成 Pending
+                    </Badge>
+                  )}
                 </div>
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   {task.completed && task.completedAt ? (
