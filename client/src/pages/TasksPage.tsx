@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { TaskForm } from "@/components/TaskForm";
 import { TaskList, type Task } from "@/components/TaskList";
+import { TodayTaskPreview, type TaskPreview } from "@/components/TodayTaskPreview";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -12,7 +13,7 @@ export default function TasksPage() {
       type: "health",
       frequency: "daily",
       scheduledTime: "07:00",
-      completed: false,
+      completed: true,
     },
     {
       id: "2",
@@ -30,6 +31,14 @@ export default function TasksPage() {
       scheduledTime: "20:00",
       completed: false,
     },
+    {
+      id: "4",
+      title: "午餐冥想 Lunch Meditation",
+      type: "health",
+      frequency: "daily",
+      scheduledTime: "12:30",
+      completed: true,
+    },
   ]);
 
   const handleToggleComplete = (taskId: string) => {
@@ -40,6 +49,15 @@ export default function TasksPage() {
     );
   };
 
+  const todayPreviewTasks: TaskPreview[] = tasks.map(task => ({
+    id: task.id,
+    title: task.title,
+    type: task.type,
+    scheduledTime: task.scheduledTime,
+    completed: task.completed,
+    completedAt: task.completed ? "07:15" : undefined,
+  }));
+
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="mb-8">
@@ -49,40 +67,48 @@ export default function TasksPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="create" className="space-y-6">
-        <TabsList data-testid="tabs-task-management">
-          <TabsTrigger value="create" data-testid="tab-create">
-            创建任务 Create
-          </TabsTrigger>
-          <TabsTrigger value="today" data-testid="tab-today">
-            今日任务 Today ({tasks.filter(t => !t.completed).length})
-          </TabsTrigger>
-        </TabsList>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-2">
+          <Tabs defaultValue="create" className="space-y-6">
+            <TabsList data-testid="tabs-task-management">
+              <TabsTrigger value="create" data-testid="tab-create">
+                创建任务 Create
+              </TabsTrigger>
+              <TabsTrigger value="today" data-testid="tab-today">
+                今日任务 Today ({tasks.filter(t => !t.completed).length})
+              </TabsTrigger>
+            </TabsList>
 
-        <TabsContent value="create">
-          <TaskForm />
-        </TabsContent>
+            <TabsContent value="create">
+              <TaskForm />
+            </TabsContent>
 
-        <TabsContent value="today">
-          <Card>
-            <CardHeader>
-              <CardTitle>今日任务 Today's Tasks</CardTitle>
-              <CardDescription>
-                完成今天的任务以保持进度 Complete today's tasks to stay on track
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {tasks.length > 0 ? (
-                <TaskList tasks={tasks} onToggleComplete={handleToggleComplete} />
-              ) : (
-                <div className="text-center py-12 text-muted-foreground">
-                  <p>暂无任务 No tasks yet</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            <TabsContent value="today">
+              <Card>
+                <CardHeader>
+                  <CardTitle>今日任务 Today's Tasks</CardTitle>
+                  <CardDescription>
+                    完成今天的任务以保持进度 Complete today's tasks to stay on track
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {tasks.length > 0 ? (
+                    <TaskList tasks={tasks} onToggleComplete={handleToggleComplete} />
+                  ) : (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <p>暂无任务 No tasks yet</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        <div>
+          <TodayTaskPreview tasks={todayPreviewTasks} />
+        </div>
+      </div>
     </div>
   );
 }
