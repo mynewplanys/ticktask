@@ -37,7 +37,7 @@ function AppContent() {
 
   return (
     <div className="ios-device-frame">
-      <SidebarProvider style={style as React.CSSProperties}>
+      <SidebarProvider defaultOpen={true} style={style as React.CSSProperties}>
         <div className="flex h-full w-full">
           <AppSidebar />
           <div className="flex flex-col flex-1">
