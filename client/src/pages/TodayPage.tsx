@@ -213,6 +213,19 @@ export default function TodayPage() {
                   )}
                 </div>
               </div>
+              <Button
+                size="sm"
+                variant={task.completed ? "outline" : "default"}
+                onClick={() => handleToggleComplete(task.id)}
+                className="flex-shrink-0"
+                data-testid={`button-complete-${task.id}`}
+              >
+                {task.completed ? (
+                  <>取消完成 Undo</>
+                ) : (
+                  <>点击完成 Complete</>
+                )}
+              </Button>
             </div>
           );
         })}

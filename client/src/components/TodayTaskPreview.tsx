@@ -179,6 +179,19 @@ export function TodayTaskPreview({ tasks: initialTasks }: TodayTaskPreviewProps)
                   )}
                 </div>
               </div>
+              <Button
+                size="sm"
+                variant={task.completed ? "outline" : "default"}
+                onClick={() => handleToggleComplete(task.id)}
+                className="flex-shrink-0"
+                data-testid={`button-complete-preview-${task.id}`}
+              >
+                {task.completed ? (
+                  <>取消完成 Undo</>
+                ) : (
+                  <>点击完成 Complete</>
+                )}
+              </Button>
             </div>
           );
         })}
