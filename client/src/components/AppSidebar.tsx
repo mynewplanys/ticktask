@@ -1,4 +1,4 @@
-import { CalendarPlus, BarChart3, CheckSquare } from "lucide-react";
+import { CalendarPlus, BarChart3, CheckSquare, Settings } from "lucide-react";
 import { useLocation } from "wouter";
 import {
   Sidebar,
@@ -11,30 +11,38 @@ import {
   SidebarMenuItem,
   SidebarHeader,
 } from "@/components/ui/sidebar";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const menuItems = [
   {
-    title: "今日任务",
+    titleZh: "今日任务",
     titleEn: "Today",
     url: "/today",
     icon: CheckSquare,
   },
   {
-    title: "任务管理",
+    titleZh: "任务管理",
     titleEn: "Tasks",
     url: "/",
     icon: CalendarPlus,
   },
   {
-    title: "统计分析",
+    titleZh: "统计分析",
     titleEn: "Statistics",
     url: "/statistics",
     icon: BarChart3,
+  },
+  {
+    titleZh: "设置",
+    titleEn: "Settings",
+    url: "/settings",
+    icon: Settings,
   },
 ];
 
 export function AppSidebar() {
   const [location] = useLocation();
+  const { t } = useLanguage();
 
   return (
     <Sidebar>
@@ -44,14 +52,13 @@ export function AppSidebar() {
             <CalendarPlus className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold">任务计划</h1>
-            <p className="text-xs text-muted-foreground">Task Planner</p>
+            <h1 className="text-lg font-semibold">{t("任务计划", "Task Planner")}</h1>
           </div>
         </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>导航 Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("导航", "Navigation")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
@@ -63,8 +70,7 @@ export function AppSidebar() {
                   >
                     <a href={item.url}>
                       <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                      <span className="text-xs text-muted-foreground ml-auto">{item.titleEn}</span>
+                      <span>{t(item.titleZh, item.titleEn)}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
