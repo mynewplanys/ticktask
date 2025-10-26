@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, CheckCircle2, Circle } from "lucide-react";
+import { Clock, CheckCircle2, Circle, XCircle } from "lucide-react";
 
 export type TaskPreview = {
   id: string;
@@ -31,6 +31,16 @@ const typeLabels: Record<string, string> = {
   other: "其他",
 };
 
+// 检查任务是否错过（简化版：未完成的任务如果计划时间已过就算错过）
+const isTaskMissed = (task: TaskPreview): boolean => {
+  if (task.completed) return false;
+  
+  const now = new Date();
+  const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+  
+  return task.scheduledTime < currentTime;
+};
+
 export function TodayTaskPreview({ tasks }: TodayTaskPreviewProps) {
   const pendingCount = tasks.filter(t => !t.completed).length;
   const completedCount = tasks.filter(t => t.completed).length;
@@ -53,56 +63,74 @@ export function TodayTaskPreview({ tasks }: TodayTaskPreviewProps) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
-        {sortedTasks.map((task) => (
-          <div
-            key={task.id}
-            className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
-              task.completed
-                ? "bg-chart-2/5 border-chart-2/20"
-                : "bg-card hover-elevate"
-            }`}
-            data-testid={`preview-task-${task.id}`}
-          >
-            {task.completed ? (
-              <CheckCircle2 className="h-5 w-5 text-chart-2 flex-shrink-0" />
-            ) : (
-              <Circle className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-            )}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap mb-1">
-                <span
-                  className={`font-medium text-sm ${
-                    task.completed ? "text-chart-2" : ""
-                  }`}
-                >
-                  {task.title}
-                </span>
-                <Badge variant="outline" className={`text-xs ${typeColors[task.type]}`}>
-                  {typeLabels[task.type]}
-                </Badge>
-              </div>
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                {task.completed && task.completedAt ? (
-                  <>
-                    <div className="flex items-center gap-1">
-                      <CheckCircle2 className="h-3 w-3 text-chart-2" />
-                      <span className="font-mono text-chart-2">完成 {task.completedAt}</span>
-                    </div>
+        {sortedTasks.map((task) => {
+          const isMissed = isTaskMissed(task);
+          
+          return (
+            <div
+              key={task.id}
+              className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
+                task.completed
+                  ? "bg-chart-2/5 border-chart-2/20"
+                  : isMissed
+                  ? "bg-destructive/5 border-destructive/20"
+                  : "bg-card hover-elevate"
+              }`}
+              data-testid={`preview-task-${task.id}`}
+            >
+              {task.completed ? (
+                <CheckCircle2 className="h-5 w-5 text-chart-2 flex-shrink-0" />
+              ) : isMissed ? (
+                <XCircle className="h-5 w-5 text-destructive flex-shrink-0" />
+              ) : (
+                <Circle className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap mb-1">
+                  <span
+                    className={`font-medium text-sm ${
+                      task.completed ? "text-chart-2" : isMissed ? "text-destructive" : ""
+                    }`}
+                  >
+                    {task.title}
+                  </span>
+                  <Badge variant="outline" className={`text-xs ${typeColors[task.type]}`}>
+                    {typeLabels[task.type]}
+                  </Badge>
+                  {task.completed && (
+                    <Badge className="text-xs bg-chart-2 text-white border-0">
+                      完成 Completed
+                    </Badge>
+                  )}
+                  {!task.completed && isMissed && (
+                    <Badge className="text-xs bg-destructive text-white border-0">
+                      错过 Missed
+                    </Badge>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  {task.completed && task.completedAt ? (
+                    <>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="h-3 w-3 text-chart-2" />
+                        <span className="font-mono text-chart-2">完成 {task.completedAt}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        <span className="font-mono">计划 {task.scheduledTime}</span>
+                      </div>
+                    </>
+                  ) : (
                     <div className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
                       <span className="font-mono">计划 {task.scheduledTime}</span>
                     </div>
-                  </>
-                ) : (
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    <span className="font-mono">计划 {task.scheduledTime}</span>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {tasks.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
