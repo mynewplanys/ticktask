@@ -1,6 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { taskTypeLabels } from "@/lib/translations";
 
 export type TaskPreview = {
   id: string;
@@ -23,15 +25,9 @@ const typeColors: Record<string, string> = {
   other: "bg-muted text-muted-foreground border-muted",
 };
 
-const typeLabels: Record<string, string> = {
-  work: "工作",
-  personal: "个人",
-  health: "健康",
-  learning: "学习",
-  other: "其他",
-};
-
 export function TodayTaskPreview({ tasks }: TodayTaskPreviewProps) {
+  const { t, language } = useLanguage();
+  
   // 按照计划时间排序
   const sortedTasks = [...tasks].sort((a, b) => {
     return a.scheduledTime.localeCompare(b.scheduledTime);
@@ -40,11 +36,9 @@ export function TodayTaskPreview({ tasks }: TodayTaskPreviewProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>今日任务预览 Today's Preview</CardTitle>
+        <CardTitle>{t("今日任务预览", "Today's Preview")}</CardTitle>
         <CardDescription>
-          {tasks.length} 个任务
-          <br />
-          {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}
+          {t(`${tasks.length} 个任务`, `${tasks.length} ${tasks.length === 1 ? 'task' : 'tasks'}`)}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
@@ -61,12 +55,12 @@ export function TodayTaskPreview({ tasks }: TodayTaskPreviewProps) {
                     {task.title}
                   </span>
                   <Badge variant="outline" className={`text-xs ${typeColors[task.type]}`}>
-                    {typeLabels[task.type]}
+                    {taskTypeLabels[language][task.type as keyof typeof taskTypeLabels.zh]}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <Clock className="h-3 w-3" />
-                  <span className="font-mono">计划 {task.scheduledTime}</span>
+                  <span className="font-mono">{t("计划", "Scheduled")} {task.scheduledTime}</span>
                 </div>
               </div>
             </div>
@@ -75,8 +69,7 @@ export function TodayTaskPreview({ tasks }: TodayTaskPreviewProps) {
 
         {tasks.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
-            <p className="text-sm">今天暂无任务</p>
-            <p className="text-xs">No tasks for today</p>
+            <p className="text-sm">{t("今天暂无任务", "No tasks for today")}</p>
           </div>
         )}
       </CardContent>

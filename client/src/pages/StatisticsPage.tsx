@@ -2,6 +2,7 @@ import { useState } from "react";
 import { StatisticsFilter, type FilterState } from "@/components/StatisticsFilter";
 import { StatisticsTable, type StatisticsRecord } from "@/components/StatisticsTable";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const mockRecords: StatisticsRecord[] = [
   {
@@ -71,6 +72,7 @@ const mockRecords: StatisticsRecord[] = [
 export default function StatisticsPage() {
   const [records] = useState<StatisticsRecord[]>(mockRecords);
   const [filters, setFilters] = useState<FilterState | null>(null);
+  const { t } = useLanguage();
 
   const filteredRecords = records.filter((record) => {
     if (!filters) return true;
@@ -104,16 +106,16 @@ export default function StatisticsPage() {
       <div className="flex-1 overflow-auto">
         <div className="container mx-auto py-8 px-4">
           <div className="mb-8">
-            <h1 className="text-3xl font-semibold mb-2">统计分析 Statistics</h1>
+            <h1 className="text-3xl font-semibold mb-2">{t("统计分析", "Statistics")}</h1>
             <p className="text-muted-foreground">
-              查看任务完成情况和趋势分析 View task completion status and trends
+              {t("查看任务完成情况和趋势分析", "View task completion status and trends")}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>总任务 Total</CardDescription>
+                <CardDescription>{t("总任务", "Total")}</CardDescription>
                 <CardTitle className="text-3xl" data-testid="text-total-tasks">
                   {totalCount}
                 </CardTitle>
@@ -122,7 +124,7 @@ export default function StatisticsPage() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>已完成 Completed</CardDescription>
+                <CardDescription>{t("已完成", "Completed")}</CardDescription>
                 <CardTitle className="text-3xl text-chart-2" data-testid="text-completed-tasks">
                   {completedCount}
                 </CardTitle>
@@ -131,7 +133,7 @@ export default function StatisticsPage() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>已错过 Missed</CardDescription>
+                <CardDescription>{t("已错过", "Missed")}</CardDescription>
                 <CardTitle className="text-3xl text-destructive" data-testid="text-missed-tasks">
                   {missedCount}
                 </CardTitle>
@@ -140,7 +142,7 @@ export default function StatisticsPage() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>完成率 Rate</CardDescription>
+                <CardDescription>{t("完成率", "Rate")}</CardDescription>
                 <CardTitle className="text-3xl" data-testid="text-completion-rate">
                   {completionRate}%
                 </CardTitle>

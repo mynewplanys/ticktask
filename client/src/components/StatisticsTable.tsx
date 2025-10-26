@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { taskTypeLabels, statusLabels } from "@/lib/translations";
 
 export type StatisticsRecord = {
   id: string;
@@ -22,14 +24,6 @@ type StatisticsTableProps = {
   records: StatisticsRecord[];
 };
 
-const typeLabels: Record<string, string> = {
-  work: "工作",
-  personal: "个人",
-  health: "健康",
-  learning: "学习",
-  other: "其他",
-};
-
 const typeColors: Record<string, string> = {
   work: "bg-primary/10 text-primary border-primary/20",
   personal: "bg-chart-3/10 text-chart-3 border-chart-3/20",
@@ -39,6 +33,8 @@ const typeColors: Record<string, string> = {
 };
 
 export function StatisticsTable({ records }: StatisticsTableProps) {
+  const { t, language } = useLanguage();
+  
   if (records.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -57,9 +53,9 @@ export function StatisticsTable({ records }: StatisticsTableProps) {
             />
           </svg>
         </div>
-        <h3 className="text-lg font-semibold mb-1">暂无数据</h3>
+        <h3 className="text-lg font-semibold mb-1">{t("暂无数据", "No data")}</h3>
         <p className="text-sm text-muted-foreground max-w-sm">
-          No data available. Try adjusting your filter settings.
+          {t("没有可用数据。请尝试调整筛选设置。", "No data available. Try adjusting your filter settings.")}
         </p>
       </div>
     );
@@ -70,10 +66,10 @@ export function StatisticsTable({ records }: StatisticsTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="font-semibold">日期 Date</TableHead>
-            <TableHead className="font-semibold">任务名称 Task</TableHead>
-            <TableHead className="font-semibold">类型 Type</TableHead>
-            <TableHead className="text-center font-semibold">状态 Status</TableHead>
+            <TableHead className="font-semibold">{t("日期", "Date")}</TableHead>
+            <TableHead className="font-semibold">{t("任务名称", "Task")}</TableHead>
+            <TableHead className="font-semibold">{t("类型", "Type")}</TableHead>
+            <TableHead className="text-center font-semibold">{t("状态", "Status")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -84,7 +80,7 @@ export function StatisticsTable({ records }: StatisticsTableProps) {
                   <span>{format(record.date, "yyyy-MM-dd")}</span>
                   {record.completedAt && (
                     <span className="text-xs text-chart-2 mt-1">
-                      完成 {record.completedAt}
+                      {t("完成", "Completed")} {record.completedAt}
                     </span>
                   )}
                 </div>
@@ -94,7 +90,7 @@ export function StatisticsTable({ records }: StatisticsTableProps) {
               </TableCell>
               <TableCell>
                 <Badge variant="outline" className={typeColors[record.taskType]}>
-                  {typeLabels[record.taskType]}
+                  {taskTypeLabels[language][record.taskType as keyof typeof taskTypeLabels.zh]}
                 </Badge>
               </TableCell>
               <TableCell className="text-center">

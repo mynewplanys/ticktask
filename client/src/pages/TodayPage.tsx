@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, CheckCircle2, Circle, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export type TaskPreview = {
   id: string;
@@ -21,12 +22,20 @@ const typeColors: Record<string, string> = {
   other: "bg-muted text-muted-foreground border-muted",
 };
 
-const typeLabels: Record<string, string> = {
+const typeLabelsZh: Record<string, string> = {
   work: "工作",
   personal: "个人",
   health: "健康",
   learning: "学习",
   other: "其他",
+};
+
+const typeLabelsEn: Record<string, string> = {
+  work: "Work",
+  personal: "Personal",
+  health: "Health",
+  learning: "Learning",
+  other: "Other",
 };
 
 const isTaskMissed = (task: TaskPreview): boolean => {
@@ -81,6 +90,9 @@ const mockTasks: TaskPreview[] = [
 export default function TodayPage() {
   const [tasks, setTasks] = useState<TaskPreview[]>(mockTasks);
   const { toast } = useToast();
+  const { t, language } = useLanguage();
+  
+  const typeLabels = language === "zh" ? typeLabelsZh : typeLabelsEn;
   
   const pendingCount = tasks.filter(t => !t.completed).length;
   const completedCount = tasks.filter(t => t.completed).length;
@@ -95,12 +107,12 @@ export default function TodayPage() {
           
           if (newCompleted) {
             toast({
-              title: "任务已完成 Task Completed",
+              title: t("任务已完成", "Task Completed"),
               description: `${task.title} - ${currentTime}`,
             });
           } else {
             toast({
-              title: "取消完成 Uncompleted",
+              title: t("取消完成", "Uncompleted"),
               description: task.title,
               variant: "destructive",
             });
@@ -126,11 +138,12 @@ export default function TodayPage() {
   return (
     <div className="container mx-auto p-6 max-w-4xl">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">今日任务 Today's Tasks</h1>
+        <h1 className="text-3xl font-bold mb-2">{t("今日任务", "Today's Tasks")}</h1>
         <p className="text-muted-foreground">
-          {pendingCount} 个待完成，{completedCount} 个已完成
-          <br />
-          {pendingCount} pending, {completedCount} completed
+          {t(
+            `${pendingCount} 个待完成，${completedCount} 个已完成`,
+            `${pendingCount} pending, ${completedCount} completed`
+          )}
         </p>
       </div>
 
@@ -179,17 +192,17 @@ export default function TodayPage() {
                   </Badge>
                   {task.completed && (
                     <Badge className="text-xs bg-chart-2 text-white border-0">
-                      完成 Completed
+                      {t("完成", "Completed")}
                     </Badge>
                   )}
                   {!task.completed && isMissed && (
                     <Badge className="text-xs bg-destructive text-white border-0">
-                      错过 Missed
+                      {t("错过", "Missed")}
                     </Badge>
                   )}
                   {!task.completed && !isMissed && (
                     <Badge className="text-xs bg-primary text-white border-0">
-                      待完成 Pending
+                      {t("待完成", "Pending")}
                     </Badge>
                   )}
                 </div>
@@ -198,17 +211,17 @@ export default function TodayPage() {
                     <>
                       <div className="flex items-center gap-1">
                         <CheckCircle2 className="h-3 w-3 text-chart-2" />
-                        <span className="font-mono text-chart-2">完成 {task.completedAt}</span>
+                        <span className="font-mono text-chart-2">{t("完成", "Completed")} {task.completedAt}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
-                        <span className="font-mono">计划 {task.scheduledTime}</span>
+                        <span className="font-mono">{t("计划", "Scheduled")} {task.scheduledTime}</span>
                       </div>
                     </>
                   ) : (
                     <div className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
-                      <span className="font-mono">计划 {task.scheduledTime}</span>
+                      <span className="font-mono">{t("计划", "Scheduled")} {task.scheduledTime}</span>
                     </div>
                   )}
                 </div>
@@ -220,11 +233,7 @@ export default function TodayPage() {
                 className="flex-shrink-0"
                 data-testid={`button-complete-${task.id}`}
               >
-                {task.completed ? (
-                  <>取消完成 Undo</>
-                ) : (
-                  <>点击完成 Complete</>
-                )}
+                {task.completed ? t("取消完成", "Undo") : t("点击完成", "Complete")}
               </Button>
             </div>
           );
@@ -232,8 +241,7 @@ export default function TodayPage() {
 
         {tasks.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
-            <p className="text-sm">今天暂无任务</p>
-            <p className="text-xs">No tasks for today</p>
+            <p className="text-sm">{t("今天暂无任务", "No tasks for today")}</p>
           </div>
         )}
       </div>

@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { TaskForm } from "@/components/TaskForm";
 import { TodayTaskPreview, type TaskPreview } from "@/components/TodayTaskPreview";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function TasksPage() {
+  const { t } = useLanguage();
   const [tasks] = useState([
     {
       id: "1",
@@ -50,9 +52,9 @@ export default function TasksPage() {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold mb-2">任务计划 Task Planning</h1>
+        <h1 className="text-3xl font-semibold mb-2">{t("任务计划", "Task Planning")}</h1>
         <p className="text-muted-foreground">
-          创建和管理您的重复任务，按时完成计划 Create and manage your recurring tasks
+          {t("创建和管理您的重复任务，按时完成计划", "Create and manage your recurring tasks")}
         </p>
       </div>
 

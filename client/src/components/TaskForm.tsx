@@ -15,6 +15,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { TaskTypeManager, type TaskType } from "@/components/TaskTypeManager";
 import { Plus, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { taskTypeLabels } from "@/lib/translations";
 
 const defaultTaskTypes: TaskType[] = [
   { value: "work", label: "工作 Work", labelEn: "Work" },
@@ -67,6 +69,7 @@ export function TaskForm() {
   const [advanceDays, setAdvanceDays] = useState("1");
   const [advanceMinutes, setAdvanceMinutes] = useState("30");
   const [overdueMinutes, setOverdueMinutes] = useState("10");
+  const { t, language } = useLanguage();
 
   const addCompletionTime = () => {
     const newId = String(Date.now());
@@ -105,31 +108,31 @@ export function TaskForm() {
   const getCompletionTimeLabel = () => {
     switch (frequency) {
       case "daily":
-        return "当天应在此时间完成任务 Task should be completed by this time today";
+        return t("当天应在此时间完成任务", "Task should be completed by this time today");
       case "weekly":
-        return "每周应在此时间完成任务 Task should be completed by this time each week";
+        return t("每周应在此时间完成任务", "Task should be completed by this time each week");
       case "monthly":
-        return "每月应在此时间完成任务 Task should be completed by this time each month";
+        return t("每月应在此时间完成任务", "Task should be completed by this time each month");
       case "yearly":
-        return "每年应在此时间完成任务 Task should be completed by this time each year";
+        return t("每年应在此时间完成任务", "Task should be completed by this time each year");
       default:
-        return "应在此时间完成任务 Task should be completed by this time";
+        return t("应在此时间完成任务", "Task should be completed by this time");
     }
   };
 
   return (
     <Card className="max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>创建新任务 Create New Task</CardTitle>
-        <CardDescription>设置任务详情和提醒时间 Set task details and reminder time</CardDescription>
+        <CardTitle>{t("创建新任务", "Create New Task")}</CardTitle>
+        <CardDescription>{t("设置任务详情和提醒时间", "Set task details and reminder time")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="title">任务标题 Title *</Label>
+            <Label htmlFor="title">{t("任务标题", "Title")} *</Label>
             <Input
               id="title"
-              placeholder="输入任务标题 Enter task title"
+              placeholder={t("输入任务标题", "Enter task title")}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
@@ -138,10 +141,10 @@ export function TaskForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">任务描述 Description</Label>
+            <Label htmlFor="description">{t("任务描述", "Description")}</Label>
             <Textarea
               id="description"
-              placeholder="输入任务描述（可选）Enter task description (optional)"
+              placeholder={t("输入任务描述（可选）", "Enter task description (optional)")}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="min-h-32 resize-y"
@@ -151,7 +154,7 @@ export function TaskForm() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">
-              <Label htmlFor="taskType">任务类型 Task Type *</Label>
+              <Label htmlFor="taskType">{t("任务类型", "Task Type")} *</Label>
               <TaskTypeManager 
                 taskTypes={taskTypes} 
                 onTaskTypesChange={setTaskTypes} 
@@ -159,7 +162,7 @@ export function TaskForm() {
             </div>
             <Select value={taskType} onValueChange={setTaskType} required>
               <SelectTrigger id="taskType" data-testid="select-task-type">
-                <SelectValue placeholder="选择任务类型 Select task type" />
+                <SelectValue placeholder={t("选择任务类型", "Select task type")} />
               </SelectTrigger>
               <SelectContent>
                 {taskTypes.map((type) => (
@@ -172,7 +175,7 @@ export function TaskForm() {
           </div>
 
           <div className="space-y-3">
-            <Label>重复频率 Frequency *</Label>
+            <Label>{t("重复频率", "Frequency")} *</Label>
             <RadioGroup value={frequency} onValueChange={setFrequency}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {frequencies.map((freq) => (
@@ -198,7 +201,7 @@ export function TaskForm() {
 
           {frequency === "weekly" && (
             <div className="space-y-2">
-              <Label htmlFor="weekday">选择星期 Select Weekday *</Label>
+              <Label htmlFor="weekday">{t("选择星期", "Select Weekday")} *</Label>
               <Select value={weekday} onValueChange={setWeekday}>
                 <SelectTrigger id="weekday" data-testid="select-weekday">
                   <SelectValue />
@@ -216,7 +219,7 @@ export function TaskForm() {
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label>应完成时间 Target Completion Time *</Label>
+              <Label>{t("应完成时间", "Target Completion Time")} *</Label>
               <Button
                 type="button"
                 size="sm"
@@ -225,7 +228,7 @@ export function TaskForm() {
                 data-testid="button-add-time"
               >
                 <Plus className="h-4 w-4 mr-1" />
-                添加时间 Add Time
+                {t("添加时间", "Add Time")}
               </Button>
             </div>
             <p className="text-sm text-muted-foreground">
@@ -238,7 +241,7 @@ export function TaskForm() {
                   <div className="flex-1">
                     {index === 0 && (
                       <Label htmlFor={`completion-hours-${time.id}`} className="text-xs text-muted-foreground">
-                        小时 Hour
+                        {t("小时", "Hour")}
                       </Label>
                     )}
                     <Select 
@@ -261,7 +264,7 @@ export function TaskForm() {
                   <div className="flex-1">
                     {index === 0 && (
                       <Label htmlFor={`completion-minutes-${time.id}`} className="text-xs text-muted-foreground">
-                        分钟 Minute
+                        {t("分钟", "Minute")}
                       </Label>
                     )}
                     <Select 
@@ -298,7 +301,7 @@ export function TaskForm() {
 
             {completionTimes.length > 1 && (
               <div className="flex flex-wrap gap-2 pt-2">
-                <span className="text-xs text-muted-foreground">已添加的时间 Added times:</span>
+                <span className="text-xs text-muted-foreground">{t("已添加的时间", "Added times")}:</span>
                 {completionTimes.map((time) => (
                   <Badge key={time.id} variant="secondary" className="text-xs font-mono">
                     {time.hours}:{time.minutes}
@@ -309,7 +312,7 @@ export function TaskForm() {
           </div>
 
           <div className="space-y-3">
-            <Label>提醒方式 Reminder Type</Label>
+            <Label>{t("提醒方式", "Reminder Type")}</Label>
             <RadioGroup value={reminderType} onValueChange={setReminderType}>
               <div className="space-y-3">
                 {reminderTypes.map((type) => (
@@ -335,7 +338,7 @@ export function TaskForm() {
 
           {reminderType === "advance" && (
             <div className="space-y-3">
-              <Label>提前提醒设置 Advance Reminder Settings</Label>
+              <Label>{t("提前提醒设置", "Advance Reminder Settings")}</Label>
               <div className="space-y-3">
                 <Select value={advanceType} onValueChange={setAdvanceType}>
                   <SelectTrigger data-testid="select-advance-type">
@@ -421,10 +424,10 @@ export function TaskForm() {
               }}
               data-testid="button-reset"
             >
-              重置 Reset
+              {t("重置", "Reset")}
             </Button>
             <Button type="submit" data-testid="button-submit">
-              创建任务 Create Task
+              {t("创建任务", "Create Task")}
             </Button>
           </div>
         </form>
