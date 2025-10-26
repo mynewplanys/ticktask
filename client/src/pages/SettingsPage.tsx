@@ -17,12 +17,12 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">
+    <div className="w-full p-4">
+      <div className="mb-4">
+        <h1 className="text-2xl font-bold mb-2">
           {t("设置", "Settings")}
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           {t("管理应用程序设置和偏好", "Manage application settings and preferences")}
         </p>
       </div>

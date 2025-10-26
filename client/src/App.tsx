@@ -27,28 +27,30 @@ function Router() {
 
 export default function App() {
   const style = {
-    "--sidebar-width": "20rem",
-    "--sidebar-width-icon": "4rem",
+    "--sidebar-width": "16rem",
+    "--sidebar-width-icon": "3rem",
   };
 
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <TooltipProvider>
-          <SidebarProvider style={style as React.CSSProperties}>
-            <div className="flex h-screen w-full">
-              <AppSidebar />
-              <div className="flex flex-col flex-1">
-                <header className="flex items-center justify-between gap-2 p-4 border-b">
-                  <SidebarTrigger data-testid="button-sidebar-toggle" />
-                  <ThemeToggle />
-                </header>
-                <main className="flex-1 overflow-auto">
-                  <Router />
-                </main>
+          <div className="ios-device-frame">
+            <SidebarProvider style={style as React.CSSProperties}>
+              <div className="flex h-full w-full">
+                <AppSidebar />
+                <div className="flex flex-col flex-1">
+                  <header className="flex items-center justify-between gap-2 p-3 border-b">
+                    <SidebarTrigger data-testid="button-sidebar-toggle" />
+                    <ThemeToggle />
+                  </header>
+                  <main className="flex-1 overflow-auto">
+                    <Router />
+                  </main>
+                </div>
               </div>
-            </div>
-          </SidebarProvider>
+            </SidebarProvider>
+          </div>
           <Toaster />
         </TooltipProvider>
       </LanguageProvider>

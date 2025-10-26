@@ -225,9 +225,9 @@ export default function TodayPage() {
   });
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">{t("今日任务", "Today's Tasks")}</h1>
+    <div className="w-full p-4">
+      <div className="mb-4">
+        <h1 className="text-2xl font-bold mb-2">{t("今日任务", "Today's Tasks")}</h1>
         <p className="text-muted-foreground">
           {t(
             `${pendingCount} 个待完成，${completedCount} 个已完成`,
@@ -335,7 +335,7 @@ export default function TodayPage() {
         )}
       </div>
 
-      <div className="mt-6 flex justify-center">
+      <div className="mt-4 flex justify-center">
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button variant="outline" className="gap-2" data-testid="button-history-backlog">
@@ -343,7 +343,7 @@ export default function TodayPage() {
               {t("补登记", "Backlog Entry")}
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogContent className="max-w-[90vw] max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{t("历史任务补登记", "Historical Task Backlog")}</DialogTitle>
             </DialogHeader>

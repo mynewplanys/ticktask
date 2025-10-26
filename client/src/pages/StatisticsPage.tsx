@@ -104,15 +104,15 @@ export default function StatisticsPage() {
       <StatisticsFilter onFilterChange={handleFilterChange} />
 
       <div className="flex-1 overflow-auto">
-        <div className="container mx-auto py-8 px-4">
-          <div className="mb-8">
-            <h1 className="text-3xl font-semibold mb-2">{t("统计分析", "Statistics")}</h1>
-            <p className="text-muted-foreground">
+        <div className="w-full p-4">
+          <div className="mb-4">
+            <h1 className="text-2xl font-semibold mb-2">{t("统计分析", "Statistics")}</h1>
+            <p className="text-sm text-muted-foreground">
               {t("查看任务完成情况和趋势分析", "View task completion status and trends")}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 gap-3 mb-4">
             <Card>
               <CardHeader className="pb-2">
                 <CardDescription>{t("总任务", "Total")}</CardDescription>
