@@ -17,13 +17,13 @@ const menuItems = [
   {
     titleZh: "今日任务",
     titleEn: "Today",
-    url: "/today",
+    url: "/",
     icon: CheckSquare,
   },
   {
     titleZh: "任务管理",
     titleEn: "Tasks",
-    url: "/",
+    url: "/tasks",
     icon: CalendarPlus,
   },
   {
