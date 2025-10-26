@@ -29,6 +29,16 @@ const frequencies = [
   { value: "yearly", label: "每年 Yearly", description: "每年重复" },
 ];
 
+const weekdays = [
+  { value: "1", label: "周一 Monday" },
+  { value: "2", label: "周二 Tuesday" },
+  { value: "3", label: "周三 Wednesday" },
+  { value: "4", label: "周四 Thursday" },
+  { value: "5", label: "周五 Friday" },
+  { value: "6", label: "周六 Saturday" },
+  { value: "0", label: "周日 Sunday" },
+];
+
 const reminderTypes = [
   { value: "fixed", label: "固定时间提醒", description: "在设定的时间提醒" },
   { value: "overdue", label: "错过后提醒", description: "错过完成时间后提醒" },
@@ -40,6 +50,7 @@ export function TaskForm() {
   const [description, setDescription] = useState("");
   const [taskType, setTaskType] = useState("");
   const [frequency, setFrequency] = useState("daily");
+  const [weekday, setWeekday] = useState("1");
   const [completionHours, setCompletionHours] = useState("18");
   const [completionMinutes, setCompletionMinutes] = useState("0");
   const [reminderType, setReminderType] = useState("fixed");
@@ -54,6 +65,7 @@ export function TaskForm() {
       description,
       taskType,
       frequency,
+      weekday: frequency === "weekly" ? weekday : null,
       completionTime: `${completionHours}:${completionMinutes}`,
       reminderType,
       reminderTime: reminderType === "fixed" ? `${reminderHours}:${reminderMinutes}` : null,
@@ -139,6 +151,24 @@ export function TaskForm() {
               </div>
             </RadioGroup>
           </div>
+
+          {frequency === "weekly" && (
+            <div className="space-y-2">
+              <Label htmlFor="weekday">选择星期 Select Weekday *</Label>
+              <Select value={weekday} onValueChange={setWeekday}>
+                <SelectTrigger id="weekday" data-testid="select-weekday">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {weekdays.map((day) => (
+                    <SelectItem key={day.value} value={day.value}>
+                      {day.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {frequency === "daily" && (
             <div className="space-y-3">
