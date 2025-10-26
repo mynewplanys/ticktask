@@ -210,12 +210,12 @@ export default function TodayPage() {
                   {task.completed && task.completedAt ? (
                     <>
                       <div className="flex items-center gap-1">
-                        <CheckCircle2 className="h-3 w-3 text-chart-2" />
-                        <span className="font-mono text-chart-2">{t("完成", "Completed")} {task.completedAt}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
                         <span className="font-mono">{t("计划", "Scheduled")} {task.scheduledTime}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="h-3 w-3 text-chart-2" />
+                        <span className="font-mono text-chart-2">{t("完成", "Completed")} {task.completedAt}</span>
                       </div>
                     </>
                   ) : (
