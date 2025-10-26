@@ -52,7 +52,8 @@ export function AppSidebar() {
             <CalendarPlus className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold">{t("任务计划", "Task Planner")}</h1>
+            <h1 className="text-lg font-semibold">TickTask</h1>
+            <p className="text-xs text-muted-foreground">{t("滴答任务", "Smart Task Manager")}</p>
           </div>
         </div>
       </SidebarHeader>
