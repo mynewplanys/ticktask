@@ -156,7 +156,7 @@ export function StatisticsFilter({ onFilterChange }: StatisticsFilterProps) {
 
         <Button onClick={handleApply} data-testid="button-apply-filter">
           <Filter className="mr-2 h-4 w-4" />
-          应用筛选 Apply
+          查看结果 Apply
         </Button>
       </div>
     </div>
