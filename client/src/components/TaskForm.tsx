@@ -12,13 +12,14 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { TaskTypeManager, type TaskType } from "@/components/TaskTypeManager";
 
-const taskTypes = [
-  { value: "work", label: "工作 Work" },
-  { value: "personal", label: "个人 Personal" },
-  { value: "health", label: "健康 Health" },
-  { value: "learning", label: "学习 Learning" },
-  { value: "other", label: "其他 Other" },
+const defaultTaskTypes: TaskType[] = [
+  { value: "work", label: "工作 Work", labelEn: "Work" },
+  { value: "personal", label: "个人 Personal", labelEn: "Personal" },
+  { value: "health", label: "健康 Health", labelEn: "Health" },
+  { value: "learning", label: "学习 Learning", labelEn: "Learning" },
+  { value: "other", label: "其他 Other", labelEn: "Other" },
 ];
 
 const frequencies = [
@@ -34,6 +35,7 @@ const reminderTypes = [
 ];
 
 export function TaskForm() {
+  const [taskTypes, setTaskTypes] = useState<TaskType[]>(defaultTaskTypes);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [taskType, setTaskType] = useState("");
@@ -90,7 +92,13 @@ export function TaskForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="taskType">任务类型 Task Type *</Label>
+            <div className="flex items-center justify-between gap-2">
+              <Label htmlFor="taskType">任务类型 Task Type *</Label>
+              <TaskTypeManager 
+                taskTypes={taskTypes} 
+                onTaskTypesChange={setTaskTypes} 
+              />
+            </div>
             <Select value={taskType} onValueChange={setTaskType} required>
               <SelectTrigger id="taskType" data-testid="select-task-type">
                 <SelectValue placeholder="选择任务类型 Select task type" />
