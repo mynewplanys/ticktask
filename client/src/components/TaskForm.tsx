@@ -40,7 +40,7 @@ const weekdays = [
 ];
 
 const reminderTypes = [
-  { value: "fixed", label: "固定时间提醒", description: "在设定的时间提醒" },
+  { value: "advance", label: "提前提醒", description: "在完成时间之前提醒" },
   { value: "overdue", label: "错过后提醒", description: "错过完成时间后提醒" },
 ];
 
@@ -53,9 +53,10 @@ export function TaskForm() {
   const [weekday, setWeekday] = useState("1");
   const [completionHours, setCompletionHours] = useState("18");
   const [completionMinutes, setCompletionMinutes] = useState("0");
-  const [reminderType, setReminderType] = useState("fixed");
-  const [reminderHours, setReminderHours] = useState("9");
-  const [reminderMinutes, setReminderMinutes] = useState("0");
+  const [reminderType, setReminderType] = useState("advance");
+  const [advanceType, setAdvanceType] = useState("minutes");
+  const [advanceDays, setAdvanceDays] = useState("1");
+  const [advanceMinutes, setAdvanceMinutes] = useState("30");
   const [overdueMinutes, setOverdueMinutes] = useState("10");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -68,7 +69,9 @@ export function TaskForm() {
       weekday: frequency === "weekly" ? weekday : null,
       completionTime: `${completionHours}:${completionMinutes}`,
       reminderType,
-      reminderTime: reminderType === "fixed" ? `${reminderHours}:${reminderMinutes}` : null,
+      advanceType: reminderType === "advance" ? advanceType : null,
+      advanceDays: reminderType === "advance" && advanceType === "days" ? advanceDays : null,
+      advanceMinutes: reminderType === "advance" && advanceType === "minutes" ? advanceMinutes : null,
       overdueMinutes: reminderType === "overdue" ? overdueMinutes : null,
     });
   };
@@ -250,41 +253,57 @@ export function TaskForm() {
             </RadioGroup>
           </div>
 
-          {reminderType === "fixed" && (
+          {reminderType === "advance" && (
             <div className="space-y-3">
-              <Label>固定提醒时间 Fixed Reminder Time</Label>
-              <div className="flex gap-3">
-                <div className="flex-1">
-                  <Label htmlFor="reminder-hours" className="text-xs text-muted-foreground">小时 Hour</Label>
-                  <Select value={reminderHours} onValueChange={setReminderHours}>
-                    <SelectTrigger id="reminder-hours" data-testid="select-reminder-hours">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Array.from({ length: 24 }, (_, i) => (
-                        <SelectItem key={i} value={String(i).padStart(2, "0")}>
-                          {String(i).padStart(2, "0")}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-end pb-2">:</div>
-                <div className="flex-1">
-                  <Label htmlFor="reminder-minutes" className="text-xs text-muted-foreground">分钟 Minute</Label>
-                  <Select value={reminderMinutes} onValueChange={setReminderMinutes}>
-                    <SelectTrigger id="reminder-minutes" data-testid="select-reminder-minutes">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Array.from({ length: 12 }, (_, i) => i * 5).map((min) => (
-                        <SelectItem key={min} value={String(min).padStart(2, "0")}>
-                          {String(min).padStart(2, "0")}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              <Label>提前提醒设置 Advance Reminder Settings</Label>
+              <div className="space-y-3">
+                <Select value={advanceType} onValueChange={setAdvanceType}>
+                  <SelectTrigger data-testid="select-advance-type">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="days">提前天数 Days in advance</SelectItem>
+                    <SelectItem value="minutes">当日提前分钟 Minutes before (same day)</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {advanceType === "days" && (
+                  <div className="space-y-2">
+                    <Label htmlFor="advance-days">提前天数 Days in Advance</Label>
+                    <Input
+                      id="advance-days"
+                      type="number"
+                      min="1"
+                      max="365"
+                      value={advanceDays}
+                      onChange={(e) => setAdvanceDays(e.target.value)}
+                      placeholder="输入提前天数"
+                      data-testid="input-advance-days"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      提前 {advanceDays} 天提醒 · Remind {advanceDays} day(s) in advance
+                    </p>
+                  </div>
+                )}
+
+                {advanceType === "minutes" && (
+                  <div className="space-y-2">
+                    <Label htmlFor="advance-minutes">提前分钟数 Minutes in Advance</Label>
+                    <Input
+                      id="advance-minutes"
+                      type="number"
+                      min="1"
+                      max="1440"
+                      value={advanceMinutes}
+                      onChange={(e) => setAdvanceMinutes(e.target.value)}
+                      placeholder="输入提前分钟数"
+                      data-testid="input-advance-minutes"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      当日提前 {advanceMinutes} 分钟提醒 · Remind {advanceMinutes} minute(s) before on the same day
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -317,7 +336,7 @@ export function TaskForm() {
                 setDescription("");
                 setTaskType("");
                 setFrequency("daily");
-                setReminderType("fixed");
+                setReminderType("advance");
                 console.log("Form reset");
               }}
               data-testid="button-reset"
