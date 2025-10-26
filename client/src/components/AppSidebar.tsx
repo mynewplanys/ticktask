@@ -1,4 +1,4 @@
-import { CalendarPlus, BarChart3 } from "lucide-react";
+import { CalendarPlus, BarChart3, CheckSquare } from "lucide-react";
 import { useLocation } from "wouter";
 import {
   Sidebar,
@@ -13,6 +13,12 @@ import {
 } from "@/components/ui/sidebar";
 
 const menuItems = [
+  {
+    title: "今日任务",
+    titleEn: "Today",
+    url: "/today",
+    icon: CheckSquare,
+  },
   {
     title: "任务管理",
     titleEn: "Tasks",

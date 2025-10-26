@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import TodayPage from "@/pages/TodayPage";
 import TasksPage from "@/pages/TasksPage";
 import StatisticsPage from "@/pages/StatisticsPage";
 import NotFound from "@/pages/not-found";
@@ -13,6 +14,7 @@ import NotFound from "@/pages/not-found";
 function Router() {
   return (
     <Switch>
+      <Route path="/today" component={TodayPage} />
       <Route path="/" component={TasksPage} />
       <Route path="/statistics" component={StatisticsPage} />
       <Route component={NotFound} />
