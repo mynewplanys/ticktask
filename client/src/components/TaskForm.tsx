@@ -262,8 +262,8 @@ export function TaskForm() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="days">提前x天 x Days in advance</SelectItem>
-                    <SelectItem value="minutes">当天提前x分钟提醒 x Minutes before (same day)</SelectItem>
+                    <SelectItem value="days">提前x天 (x Days in advance)</SelectItem>
+                    <SelectItem value="minutes">当天提前x分钟提醒 (x Minutes before same day)</SelectItem>
                   </SelectContent>
                 </Select>
 
