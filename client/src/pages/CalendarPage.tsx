@@ -626,8 +626,8 @@ export default function CalendarPage() {
         </CardContent>
       </Card>
 
-      {/* 选中日期的任务列表 */}
-      {selectedDate && (
+      {/* 选中日期的任务列表 - 仅在月视图下显示 */}
+      {selectedDate && viewMode === 'month' && (
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
