@@ -493,17 +493,45 @@ export default function CalendarPage() {
         </CardHeader>
 
         <CardContent>
-          {/* 星期标题 */}
-          <div className="grid grid-cols-7 gap-1 mb-2">
-            {weekDaysZh.map((day, index) => (
-              <div
-                key={index}
-                className="text-center text-xs font-medium text-muted-foreground py-2"
-              >
-                {t(weekDaysZh[index], weekDaysEn[index])}
-              </div>
-            ))}
-          </div>
+          {/* 星期标题 - 周视图可点击，月视图静态 */}
+          {viewMode === 'week' ? (
+            <div className="grid grid-cols-7 gap-1 mb-2">
+              {generateWeekDays().map((date, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleDateClick(date)}
+                  data-testid={`week-header-${index}`}
+                  className={cn(
+                    "text-center text-xs font-medium py-2 rounded-md transition-colors",
+                    "hover-elevate active-elevate-2",
+                    isToday(date) ? "text-primary font-bold" : "text-muted-foreground",
+                    isSelected(date) && "bg-accent"
+                  )}
+                >
+                  <div className="flex flex-col items-center gap-1">
+                    <span>{t(weekDaysZh[date.getDay()], weekDaysEn[date.getDay()])}</span>
+                    <span className={cn(
+                      "text-base font-semibold",
+                      isToday(date) && "text-primary"
+                    )}>
+                      {date.getDate()}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-7 gap-1 mb-2">
+              {weekDaysZh.map((day, index) => (
+                <div
+                  key={index}
+                  className="text-center text-xs font-medium text-muted-foreground py-2"
+                >
+                  {t(weekDaysZh[index], weekDaysEn[index])}
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* 月视图 */}
           {viewMode === 'month' && (
