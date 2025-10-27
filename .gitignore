@@ -1,6 +1,44 @@
-node_modules
-dist
-.DS_Store
+# 依赖
+node_modules/
+package-lock.json
+
+# 构建输出
+dist/
+.output/
+.vite/
+build/
 server/public
-vite.config.ts.*
+
+# 环境变量
+.env
+.env.local
+.env.*.local
+
+# iOS/Android构建（Mac上生成）
+ios/
+android/
+.capacitor/
+
+# 日志
+*.log
+npm-debug.log*
+
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Replit特定
+.replit
+replit.nix
+.config/
+.cache/
+.upm/
+
+# 临时文件
+*.tmp
 *.tar.gz
+vite.config.ts.*
