@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Check, Plus, Pencil, Trash2 } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Check, Plus, Pencil, Trash2, CalendarDays, CalendarRange } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -28,11 +28,15 @@ interface Task {
   time?: string;
 }
 
+// 视图类型
+type ViewMode = 'month' | 'week';
+
 export default function CalendarPage() {
   const { t, language } = useLanguage();
   const { toast } = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [viewMode, setViewMode] = useState<ViewMode>('month');
   
   // 对话框状态
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -159,37 +163,97 @@ export default function CalendarPage() {
     setCurrentDate(newDate);
   };
 
-  // 检查是否是今天
-  const isToday = (day: number | null) => {
+  // 切换周
+  const changeWeek = (offset: number) => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(currentDate.getDate() + (offset * 7));
+    setCurrentDate(newDate);
+  };
+
+  // 生成周视图日期数组
+  const generateWeekDays = () => {
+    const weekDays = [];
+    const startOfWeek = new Date(currentDate);
+    const day = startOfWeek.getDay();
+    startOfWeek.setDate(startOfWeek.getDate() - day); // 调整到周日
+
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(startOfWeek);
+      date.setDate(startOfWeek.getDate() + i);
+      weekDays.push(date);
+    }
+
+    return weekDays;
+  };
+
+  // 获取周视图的日期范围显示
+  const getWeekRangeText = () => {
+    const weekDays = generateWeekDays();
+    const startDate = weekDays[0];
+    const endDate = weekDays[6];
+    
+    if (language === 'zh') {
+      return `${startDate.getMonth() + 1}月${startDate.getDate()}日 - ${endDate.getMonth() + 1}月${endDate.getDate()}日`;
+    } else {
+      return `${monthNames[startDate.getMonth()]} ${startDate.getDate()} - ${monthNames[endDate.getMonth()]} ${endDate.getDate()}`;
+    }
+  };
+
+  // 检查是否是今天（支持number和Date）
+  const isToday = (day: number | Date | null) => {
     if (!day) return false;
     const today = new Date();
-    return (
-      day === today.getDate() &&
-      currentDate.getMonth() === today.getMonth() &&
-      currentDate.getFullYear() === today.getFullYear()
-    );
+    
+    if (typeof day === 'number') {
+      return (
+        day === today.getDate() &&
+        currentDate.getMonth() === today.getMonth() &&
+        currentDate.getFullYear() === today.getFullYear()
+      );
+    } else {
+      return formatDate(day) === formatDate(today);
+    }
   };
 
-  // 检查是否是选中日期
-  const isSelected = (day: number | null) => {
+  // 检查是否是选中日期（支持number和Date）
+  const isSelected = (day: number | Date | null) => {
     if (!day || !selectedDate) return false;
-    return (
-      day === selectedDate.getDate() &&
-      currentDate.getMonth() === selectedDate.getMonth() &&
-      currentDate.getFullYear() === selectedDate.getFullYear()
-    );
+    
+    if (typeof day === 'number') {
+      return (
+        day === selectedDate.getDate() &&
+        currentDate.getMonth() === selectedDate.getMonth() &&
+        currentDate.getFullYear() === selectedDate.getFullYear()
+      );
+    } else {
+      return formatDate(day) === formatDate(selectedDate);
+    }
   };
 
-  // 获取指定日期的任务数量
-  const getTaskCount = (day: number | null) => {
+  // 获取指定日期的任务数量（支持number和Date）
+  const getTaskCount = (day: number | Date | null) => {
     if (!day) return 0;
-    const dateStr = formatDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day));
+    let dateStr: string;
+    
+    if (typeof day === 'number') {
+      dateStr = formatDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day));
+    } else {
+      dateStr = formatDate(day);
+    }
+    
     return tasks.filter(task => task.date === dateStr).length;
   };
 
-  // 点击日期
-  const handleDateClick = (day: number) => {
-    const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+  // 点击日期（支持number和Date）
+  const handleDateClick = (day: number | Date) => {
+    let newDate: Date;
+    
+    if (typeof day === 'number') {
+      newDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    } else {
+      newDate = day;
+    }
+    
     setSelectedDate(newDate);
   };
 
@@ -370,31 +434,60 @@ export default function CalendarPage() {
 
       {/* 日历卡片 */}
       <Card>
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-3 space-y-3">
+          {/* 导航和标题 */}
           <div className="flex items-center justify-between">
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => changeMonth(-1)}
-              data-testid="button-prev-month"
+              onClick={() => viewMode === 'month' ? changeMonth(-1) : changeWeek(-1)}
+              data-testid={viewMode === 'month' ? "button-prev-month" : "button-prev-week"}
             >
               <ChevronLeft className="h-5 w-5" />
             </Button>
             
             <CardTitle className="text-lg">
-              {t(
-                `${currentDate.getFullYear()}年 ${monthNamesZh[currentDate.getMonth()]}`,
-                `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`
+              {viewMode === 'month' ? (
+                t(
+                  `${currentDate.getFullYear()}年 ${monthNamesZh[currentDate.getMonth()]}`,
+                  `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`
+                )
+              ) : (
+                getWeekRangeText()
               )}
             </CardTitle>
             
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => changeMonth(1)}
-              data-testid="button-next-month"
+              onClick={() => viewMode === 'month' ? changeMonth(1) : changeWeek(1)}
+              data-testid={viewMode === 'month' ? "button-next-month" : "button-next-week"}
             >
               <ChevronRight className="h-5 w-5" />
+            </Button>
+          </div>
+
+          {/* 视图切换按钮 */}
+          <div className="flex items-center justify-center gap-2">
+            <Button
+              variant={viewMode === 'month' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setViewMode('month')}
+              data-testid="button-view-month"
+              className="flex items-center gap-2"
+            >
+              <CalendarDays className="h-4 w-4" />
+              {t("月", "Month")}
+            </Button>
+            <Button
+              variant={viewMode === 'week' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setViewMode('week')}
+              data-testid="button-view-week"
+              className="flex items-center gap-2"
+            >
+              <CalendarRange className="h-4 w-4" />
+              {t("周", "Week")}
             </Button>
           </div>
         </CardHeader>
@@ -412,38 +505,124 @@ export default function CalendarPage() {
             ))}
           </div>
 
-          {/* 日期网格 */}
-          <div className="grid grid-cols-7 gap-1">
-            {days.map((day, index) => (
-              <div
-                key={index}
-                className="aspect-square"
-              >
-                {day && (
+          {/* 月视图 */}
+          {viewMode === 'month' && (
+            <div className="grid grid-cols-7 gap-1">
+              {days.map((day, index) => (
+                <div
+                  key={index}
+                  className="aspect-square"
+                >
+                  {day && (
+                    <button
+                      onClick={() => handleDateClick(day)}
+                      data-testid={`calendar-day-${day}`}
+                      className={cn(
+                        "w-full h-full rounded-lg flex flex-col items-center justify-center",
+                        "text-sm font-medium transition-colors relative",
+                        "hover-elevate active-elevate-2",
+                        isToday(day) && "bg-primary text-primary-foreground",
+                        isSelected(day) && !isToday(day) && "bg-accent text-accent-foreground",
+                        !isToday(day) && !isSelected(day) && "text-foreground"
+                      )}
+                    >
+                      <span>{day}</span>
+                      {getTaskCount(day) > 0 && (
+                        <div className={cn(
+                          "w-1 h-1 rounded-full mt-1",
+                          isToday(day) ? "bg-primary-foreground" : "bg-primary"
+                        )} />
+                      )}
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* 周视图 */}
+          {viewMode === 'week' && (
+            <div className="space-y-2">
+              {generateWeekDays().map((date, index) => {
+                const dayTasks = tasks.filter(task => task.date === formatDate(date)).sort((a, b) => {
+                  if (a.time && b.time) return a.time.localeCompare(b.time);
+                  if (a.time && !b.time) return -1;
+                  if (!a.time && b.time) return 1;
+                  return 0;
+                });
+
+                return (
                   <button
-                    onClick={() => handleDateClick(day)}
-                    data-testid={`calendar-day-${day}`}
+                    key={index}
+                    onClick={() => handleDateClick(date)}
+                    data-testid={`week-day-${formatDate(date)}`}
                     className={cn(
-                      "w-full h-full rounded-lg flex flex-col items-center justify-center",
-                      "text-sm font-medium transition-colors relative",
+                      "w-full p-3 rounded-lg transition-colors text-left",
                       "hover-elevate active-elevate-2",
-                      isToday(day) && "bg-primary text-primary-foreground",
-                      isSelected(day) && !isToday(day) && "bg-accent text-accent-foreground",
-                      !isToday(day) && !isSelected(day) && "text-foreground"
+                      isToday(date) && "bg-primary/10 border border-primary",
+                      isSelected(date) && !isToday(date) && "bg-accent",
+                      !isToday(date) && !isSelected(date) && "bg-muted/30"
                     )}
                   >
-                    <span>{day}</span>
-                    {getTaskCount(day) > 0 && (
-                      <div className={cn(
-                        "w-1 h-1 rounded-full mt-1",
-                        isToday(day) ? "bg-primary-foreground" : "bg-primary"
-                      )} />
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className={cn(
+                          "text-xs font-medium",
+                          isToday(date) ? "text-primary" : "text-muted-foreground"
+                        )}>
+                          {t(weekDaysZh[date.getDay()], weekDaysEn[date.getDay()])}
+                        </span>
+                        <span className={cn(
+                          "text-lg font-semibold",
+                          isToday(date) && "text-primary"
+                        )}>
+                          {date.getDate()}
+                        </span>
+                        {isToday(date) && (
+                          <Badge variant="default" className="text-xs">
+                            {t("今", "Today")}
+                          </Badge>
+                        )}
+                      </div>
+                      {dayTasks.length > 0 && (
+                        <Badge variant="secondary" className="text-xs">
+                          {dayTasks.length}
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    {dayTasks.length > 0 ? (
+                      <div className="space-y-1">
+                        {dayTasks.slice(0, 3).map(task => (
+                          <div
+                            key={task.id}
+                            className={cn(
+                              "text-xs truncate",
+                              task.completed && "line-through text-muted-foreground"
+                            )}
+                          >
+                            {task.time && (
+                              <span className="text-muted-foreground mr-1">{task.time}</span>
+                            )}
+                            {t(task.title, task.titleEn)}
+                          </div>
+                        ))}
+                        {dayTasks.length > 3 && (
+                          <div className="text-xs text-muted-foreground">
+                            +{dayTasks.length - 3} {t("更多", "more")}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-xs text-muted-foreground">
+                        {t("无任务", "No tasks")}
+                      </div>
                     )}
                   </button>
-                )}
-              </div>
-            ))}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </CardContent>
       </Card>
 
