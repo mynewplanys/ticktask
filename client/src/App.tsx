@@ -8,6 +8,7 @@ import { BottomTabBar } from "@/components/BottomTabBar";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { useSwipeBack } from "@/hooks/useSwipeBack";
 import TodayPage from "@/pages/TodayPage";
+import CalendarPage from "@/pages/CalendarPage";
 import TasksPage from "@/pages/TasksPage";
 import StatisticsPage from "@/pages/StatisticsPage";
 import SettingsPage from "@/pages/SettingsPage";
@@ -17,6 +18,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={TodayPage} />
+      <Route path="/calendar" component={CalendarPage} />
       <Route path="/tasks" component={TasksPage} />
       <Route path="/statistics" component={StatisticsPage} />
       <Route path="/settings" component={SettingsPage} />

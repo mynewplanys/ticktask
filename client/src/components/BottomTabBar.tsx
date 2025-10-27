@@ -1,4 +1,4 @@
-import { CalendarPlus, BarChart3, CheckSquare, Settings } from "lucide-react";
+import { CalendarPlus, BarChart3, CheckSquare, Settings, Calendar } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -9,6 +9,12 @@ const tabItems = [
     titleEn: "Today",
     url: "/",
     icon: CheckSquare,
+  },
+  {
+    titleZh: "日历",
+    titleEn: "Calendar",
+    url: "/calendar",
+    icon: Calendar,
   },
   {
     titleZh: "任务",
