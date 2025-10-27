@@ -8,7 +8,8 @@ export default function TasksPage() {
   const [tasks] = useState([
     {
       id: "1",
-      title: "晨间锻炼 Morning Exercise",
+      title: "晨间锻炼",
+      titleEn: "Morning Exercise",
       type: "health",
       frequency: "daily",
       scheduledTime: "07:00",
@@ -16,7 +17,8 @@ export default function TasksPage() {
     },
     {
       id: "2",
-      title: "团队会议 Team Meeting",
+      title: "团队会议",
+      titleEn: "Team Meeting",
       type: "work",
       frequency: "weekly",
       scheduledTime: "10:00",
@@ -24,7 +26,8 @@ export default function TasksPage() {
     },
     {
       id: "3",
-      title: "学习新技术 Learn New Tech",
+      title: "学习新技术",
+      titleEn: "Learn New Tech",
       type: "learning",
       frequency: "daily",
       scheduledTime: "20:00",
@@ -32,7 +35,8 @@ export default function TasksPage() {
     },
     {
       id: "4",
-      title: "午餐冥想 Lunch Meditation",
+      title: "午餐冥想",
+      titleEn: "Lunch Meditation",
       type: "health",
       frequency: "daily",
       scheduledTime: "12:30",
@@ -43,6 +47,7 @@ export default function TasksPage() {
   const todayPreviewTasks: TaskPreview[] = tasks.map(task => ({
     id: task.id,
     title: task.title,
+    titleEn: task.titleEn,
     type: task.type,
     scheduledTime: task.scheduledTime,
     completed: task.completed,

@@ -7,6 +7,7 @@ import { taskTypeLabels } from "@/lib/translations";
 export type TaskPreview = {
   id: string;
   title: string;
+  titleEn: string;
   type: string;
   scheduledTime: string;
   completed: boolean;
@@ -52,7 +53,7 @@ export function TodayTaskPreview({ tasks }: TodayTaskPreviewProps) {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap mb-1">
                   <span className="font-medium text-sm">
-                    {task.title}
+                    {t(task.title, task.titleEn)}
                   </span>
                   <Badge variant="outline" className={`text-xs ${typeColors[task.type]}`}>
                     {taskTypeLabels[language][task.type as keyof typeof taskTypeLabels.zh]}

@@ -12,6 +12,7 @@ import { zhCN } from "date-fns/locale";
 export type TaskPreview = {
   id: string;
   title: string;
+  titleEn: string;
   type: string;
   scheduledTime: string;
   completed: boolean;
@@ -59,6 +60,7 @@ const mockTasks: TaskPreview[] = [
   {
     id: "1",
     title: "晨间锻炼",
+    titleEn: "Morning Exercise",
     type: "health",
     scheduledTime: "07:00",
     completed: true,
@@ -67,6 +69,7 @@ const mockTasks: TaskPreview[] = [
   {
     id: "2",
     title: "查看邮件",
+    titleEn: "Check Email",
     type: "work",
     scheduledTime: "09:00",
     completed: true,
@@ -75,6 +78,7 @@ const mockTasks: TaskPreview[] = [
   {
     id: "3",
     title: "团队会议",
+    titleEn: "Team Meeting",
     type: "work",
     scheduledTime: "10:30",
     completed: false,
@@ -82,6 +86,7 @@ const mockTasks: TaskPreview[] = [
   {
     id: "4",
     title: "午餐",
+    titleEn: "Lunch",
     type: "personal",
     scheduledTime: "12:00",
     completed: false,
@@ -89,6 +94,7 @@ const mockTasks: TaskPreview[] = [
   {
     id: "5",
     title: "项目开发",
+    titleEn: "Project Development",
     type: "work",
     scheduledTime: "14:00",
     completed: false,
@@ -101,6 +107,7 @@ const mockHistoricalTasks: HistoricalTaskPreview[] = [
     id: "h1",
     date: "2025-10-25",
     title: "晨间锻炼",
+    titleEn: "Morning Exercise",
     type: "health",
     scheduledTime: "07:00",
     completed: true,
@@ -110,6 +117,7 @@ const mockHistoricalTasks: HistoricalTaskPreview[] = [
     id: "h2",
     date: "2025-10-25",
     title: "查看邮件",
+    titleEn: "Check Email",
     type: "work",
     scheduledTime: "09:00",
     completed: false,
@@ -118,6 +126,7 @@ const mockHistoricalTasks: HistoricalTaskPreview[] = [
     id: "h3",
     date: "2025-10-24",
     title: "晨间锻炼",
+    titleEn: "Morning Exercise",
     type: "health",
     scheduledTime: "07:00",
     completed: true,
@@ -127,6 +136,7 @@ const mockHistoricalTasks: HistoricalTaskPreview[] = [
     id: "h4",
     date: "2025-10-24",
     title: "团队会议",
+    titleEn: "Team Meeting",
     type: "work",
     scheduledTime: "10:00",
     completed: true,
@@ -158,12 +168,12 @@ export default function TodayPage() {
           if (newCompleted) {
             toast({
               title: t("任务已完成", "Task Completed"),
-              description: `${task.title} - ${currentTime}`,
+              description: `${language === "zh" ? task.title : task.titleEn} - ${currentTime}`,
             });
           } else {
             toast({
               title: t("取消完成", "Uncompleted"),
-              description: task.title,
+              description: language === "zh" ? task.title : task.titleEn,
               variant: "destructive",
             });
           }
@@ -190,12 +200,12 @@ export default function TodayPage() {
           if (newCompleted) {
             toast({
               title: t("任务已完成", "Task Completed"),
-              description: `${task.title} - ${currentTime}`,
+              description: `${language === "zh" ? task.title : task.titleEn} - ${currentTime}`,
             });
           } else {
             toast({
               title: t("取消完成", "Uncompleted"),
-              description: task.title,
+              description: language === "zh" ? task.title : task.titleEn,
               variant: "destructive",
             });
           }
@@ -274,7 +284,7 @@ export default function TodayPage() {
                       task.completed ? "text-chart-2" : isMissed ? "text-destructive" : ""
                     }`}
                   >
-                    {task.title}
+                    {t(task.title, task.titleEn)}
                   </span>
                   <Badge variant="outline" className={`text-xs ${typeColors[task.type]}`}>
                     {typeLabels[task.type]}
@@ -411,7 +421,7 @@ export default function TodayPage() {
                                   task.completed ? "text-chart-2" : ""
                                 }`}
                               >
-                                {task.title}
+                                {t(task.title, task.titleEn)}
                               </span>
                               <Badge variant="outline" className={`text-xs ${typeColors[task.type]}`}>
                                 {typeLabels[task.type]}
