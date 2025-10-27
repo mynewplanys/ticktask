@@ -93,15 +93,22 @@ export default function CalendarPage() {
       date: formatDate(getDateWithOffset(12)),
       title: "月度总结",
       titleEn: "Monthly summary",
-      completed: false,
+      completed: true,
     },
     {
       id: "7",
       date: formatDate(getDateWithOffset(20)),
       title: "产品发布",
       titleEn: "Product release",
-      completed: false,
+      completed: true,
       time: "15:00"
+    },
+    {
+      id: "9",
+      date: formatDate(getDateWithOffset(20)),
+      title: "团队庆祝",
+      titleEn: "Team celebration",
+      completed: true,
     },
     {
       id: "8",
@@ -242,6 +249,22 @@ export default function CalendarPage() {
     }
     
     return tasks.filter(task => task.date === dateStr).length;
+  };
+
+  // 检查某天的所有任务是否都已完成
+  const isAllTasksCompleted = (day: number | Date | null) => {
+    if (!day) return false;
+    let dateStr: string;
+    
+    if (typeof day === 'number') {
+      dateStr = formatDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day));
+    } else {
+      dateStr = formatDate(day);
+    }
+    
+    const dayTasks = tasks.filter(task => task.date === dateStr);
+    // 必须有任务，且所有任务都已完成
+    return dayTasks.length > 0 && dayTasks.every(task => task.completed);
   };
 
   // 点击日期（支持number和Date）
@@ -549,16 +572,27 @@ export default function CalendarPage() {
                         "w-full h-full rounded-lg flex flex-col items-center justify-center",
                         "text-sm font-medium transition-colors relative",
                         "hover-elevate active-elevate-2",
+                        // 今天：蓝色背景
                         isToday(day) && "bg-primary text-primary-foreground",
-                        isSelected(day) && !isToday(day) && "bg-accent text-accent-foreground",
-                        !isToday(day) && !isSelected(day) && "text-foreground"
+                        // 所有任务已完成：绿色背景（优先级低于今天）
+                        !isToday(day) && isAllTasksCompleted(day) && "bg-green-500/20 text-green-700 dark:bg-green-500/30 dark:text-green-400",
+                        // 选中但不是今天且未全部完成：灰色背景
+                        isSelected(day) && !isToday(day) && !isAllTasksCompleted(day) && "bg-accent text-accent-foreground",
+                        // 普通日期
+                        !isToday(day) && !isSelected(day) && !isAllTasksCompleted(day) && "text-foreground"
                       )}
                     >
                       <span>{day}</span>
-                      {getTaskCount(day) > 0 && (
+                      {getTaskCount(day) > 0 && !isAllTasksCompleted(day) && (
                         <div className={cn(
                           "w-1 h-1 rounded-full mt-1",
                           isToday(day) ? "bg-primary-foreground" : "bg-primary"
+                        )} />
+                      )}
+                      {isAllTasksCompleted(day) && (
+                        <Check className={cn(
+                          "h-3 w-3 absolute top-0.5 right-0.5",
+                          isToday(day) ? "text-primary-foreground" : "text-green-600 dark:text-green-400"
                         )} />
                       )}
                     </button>
