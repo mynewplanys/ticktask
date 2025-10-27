@@ -1,10 +1,21 @@
 import { useState } from "react";
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Check } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Check, Plus, Pencil, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 // 任务数据类型
@@ -18,9 +29,19 @@ interface Task {
 }
 
 export default function CalendarPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { toast } = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  
+  // 对话框状态
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  
+  // 表单数据
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskTime, setTaskTime] = useState("");
   
   // 模拟任务数据（后续从API获取）
   const [tasks, setTasks] = useState<Task[]>([
@@ -98,7 +119,7 @@ export default function CalendarPage() {
   // 获取偏移日期
   function getDateWithOffset(dayOffset: number): Date {
     const date = new Date();
-    date.setDate(date.getDate() + dayOffset - date.getDate() + dayOffset);
+    date.setDate(date.getDate() + dayOffset);
     return date;
   }
 
@@ -177,6 +198,103 @@ export default function CalendarPage() {
     setTasks(tasks.map(task =>
       task.id === taskId ? { ...task, completed: !task.completed } : task
     ));
+  };
+
+  // 打开添加任务对话框
+  const openAddDialog = () => {
+    setTaskTitle("");
+    setTaskTime("");
+    setIsAddDialogOpen(true);
+  };
+
+  // 添加新任务
+  const handleAddTask = () => {
+    if (!taskTitle.trim()) {
+      toast({
+        title: t("请输入任务标题", "Please enter task title"),
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!selectedDate) {
+      toast({
+        title: t("请选择日期", "Please select a date"),
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const newTask: Task = {
+      id: Date.now().toString(),
+      date: formatDate(selectedDate),
+      title: taskTitle,
+      titleEn: taskTitle, // 简化处理，实际应用中可能需要翻译
+      completed: false,
+      time: taskTime || undefined
+    };
+
+    setTasks([...tasks, newTask]);
+    setIsAddDialogOpen(false);
+    setTaskTitle("");
+    setTaskTime("");
+
+    toast({
+      title: t("任务已添加", "Task added"),
+      description: t(`已成功添加任务：${taskTitle}`, `Successfully added: ${taskTitle}`)
+    });
+  };
+
+  // 打开编辑任务对话框
+  const openEditDialog = (task: Task) => {
+    setEditingTask(task);
+    setTaskTitle(language === "zh" ? task.title : task.titleEn);
+    setTaskTime(task.time || "");
+    setIsEditDialogOpen(true);
+  };
+
+  // 更新任务
+  const handleUpdateTask = () => {
+    if (!taskTitle.trim()) {
+      toast({
+        title: t("请输入任务标题", "Please enter task title"),
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!editingTask) return;
+
+    setTasks(tasks.map(task =>
+      task.id === editingTask.id
+        ? {
+            ...task,
+            title: language === "zh" ? taskTitle : task.title,
+            titleEn: language === "en" ? taskTitle : task.titleEn,
+            time: taskTime || undefined
+          }
+        : task
+    ));
+
+    setIsEditDialogOpen(false);
+    setEditingTask(null);
+    setTaskTitle("");
+    setTaskTime("");
+
+    toast({
+      title: t("任务已更新", "Task updated"),
+      description: t("任务信息已成功更新", "Task has been updated successfully")
+    });
+  };
+
+  // 删除任务
+  const handleDeleteTask = (taskId: string, taskTitle: string) => {
+    setTasks(tasks.filter(task => task.id !== taskId));
+    
+    toast({
+      title: t("任务已删除", "Task deleted"),
+      description: t(`已删除任务：${taskTitle}`, `Deleted: ${taskTitle}`)
+    });
   };
 
   // 获取选中日期的任务
@@ -321,23 +439,39 @@ export default function CalendarPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base">
-                {formatDisplayDate(selectedDate)}
-                {selectedDateTasks.length > 0 && (
-                  <span className="ml-2 text-sm font-normal text-muted-foreground">
-                    ({selectedDateTasks.filter(t => t.completed).length}/{selectedDateTasks.length} {t("已完成", "completed")})
-                  </span>
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-base">
+                  {formatDisplayDate(selectedDate)}
+                  {selectedDateTasks.length > 0 && (
+                    <span className="ml-2 text-sm font-normal text-muted-foreground">
+                      ({selectedDateTasks.filter(t => t.completed).length}/{selectedDateTasks.length} {t("已完成", "completed")})
+                    </span>
+                  )}
+                </CardTitle>
+                {isToday(selectedDate.getDate()) && (
+                  <Badge variant="default">{t("今日", "Today")}</Badge>
                 )}
-              </CardTitle>
-              {isToday(selectedDate.getDate()) && (
-                <Badge variant="default">{t("今日", "Today")}</Badge>
-              )}
+              </div>
+              <Button
+                size="sm"
+                onClick={openAddDialog}
+                data-testid="button-add-task"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                {t("添加", "Add")}
+              </Button>
             </div>
           </CardHeader>
           <CardContent className="space-y-2">
             {selectedDateTasks.length === 0 ? (
-              <div className="text-center py-8 text-sm text-muted-foreground">
-                {t("该日期暂无任务", "No tasks for this date")}
+              <div className="text-center py-8">
+                <p className="text-sm text-muted-foreground mb-4">
+                  {t("该日期暂无任务", "No tasks for this date")}
+                </p>
+                <Button variant="outline" onClick={openAddDialog}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t("添加第一个任务", "Add first task")}
+                </Button>
               </div>
             ) : (
               selectedDateTasks.map((task) => (
@@ -345,7 +479,7 @@ export default function CalendarPage() {
                   key={task.id}
                   data-testid={`task-${task.id}`}
                   className={cn(
-                    "flex items-center gap-3 p-3 rounded-lg transition-colors",
+                    "flex items-center gap-3 p-3 rounded-lg transition-colors group",
                     "bg-muted/50 hover-elevate"
                   )}
                 >
@@ -373,12 +507,121 @@ export default function CalendarPage() {
                       <Check className="h-4 w-4 text-primary" />
                     </div>
                   )}
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => openEditDialog(task)}
+                      data-testid={`button-edit-${task.id}`}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive"
+                      onClick={() => handleDeleteTask(task.id, t(task.title, task.titleEn))}
+                      data-testid={`button-delete-${task.id}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               ))
             )}
           </CardContent>
         </Card>
       )}
+
+      {/* 添加任务对话框 */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent data-testid="dialog-add-task">
+          <DialogHeader>
+            <DialogTitle>{t("添加新任务", "Add New Task")}</DialogTitle>
+            <DialogDescription>
+              {t("为选中的日期添加新任务", "Add a new task for the selected date")}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="task-title">{t("任务标题", "Task Title")}</Label>
+              <Input
+                id="task-title"
+                placeholder={t("输入任务标题...", "Enter task title...")}
+                value={taskTitle}
+                onChange={(e) => setTaskTitle(e.target.value)}
+                data-testid="input-task-title"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="task-time">{t("时间（可选）", "Time (Optional)")}</Label>
+              <Input
+                id="task-time"
+                type="time"
+                value={taskTime}
+                onChange={(e) => setTaskTime(e.target.value)}
+                data-testid="input-task-time"
+              />
+            </div>
+            {selectedDate && (
+              <div className="text-sm text-muted-foreground">
+                {t("日期", "Date")}: {formatDisplayDate(selectedDate)}
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+              {t("取消", "Cancel")}
+            </Button>
+            <Button onClick={handleAddTask} data-testid="button-confirm-add">
+              {t("添加", "Add")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 编辑任务对话框 */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent data-testid="dialog-edit-task">
+          <DialogHeader>
+            <DialogTitle>{t("编辑任务", "Edit Task")}</DialogTitle>
+            <DialogDescription>
+              {t("修改任务信息", "Update task information")}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-task-title">{t("任务标题", "Task Title")}</Label>
+              <Input
+                id="edit-task-title"
+                placeholder={t("输入任务标题...", "Enter task title...")}
+                value={taskTitle}
+                onChange={(e) => setTaskTitle(e.target.value)}
+                data-testid="input-edit-task-title"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-task-time">{t("时间（可选）", "Time (Optional)")}</Label>
+              <Input
+                id="edit-task-time"
+                type="time"
+                value={taskTime}
+                onChange={(e) => setTaskTime(e.target.value)}
+                data-testid="input-edit-task-time"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              {t("取消", "Cancel")}
+            </Button>
+            <Button onClick={handleUpdateTask} data-testid="button-confirm-edit">
+              {t("保存", "Save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
