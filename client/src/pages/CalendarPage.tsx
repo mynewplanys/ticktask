@@ -297,11 +297,24 @@ export default function CalendarPage() {
     });
   };
 
-  // 获取选中日期的任务
+  // 获取选中日期的任务（按时间排序）
   const getSelectedDateTasks = () => {
     if (!selectedDate) return [];
     const dateStr = formatDate(selectedDate);
-    return tasks.filter(task => task.date === dateStr);
+    const filteredTasks = tasks.filter(task => task.date === dateStr);
+    
+    // 按时间排序：有时间的任务在前，按时间升序；没有时间的任务在后
+    return filteredTasks.sort((a, b) => {
+      // 如果两个任务都有时间，按时间升序排列
+      if (a.time && b.time) {
+        return a.time.localeCompare(b.time);
+      }
+      // 有时间的任务排在没时间的任务前面
+      if (a.time && !b.time) return -1;
+      if (!a.time && b.time) return 1;
+      // 两个都没时间，保持原顺序
+      return 0;
+    });
   };
 
   // 格式化显示日期
